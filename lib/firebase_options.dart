@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '796565517206',
     projectId: 'e-commerce-7f9e2',
     storageBucket: 'e-commerce-7f9e2.firebasestorage.app',
-    iosClientId: '796565517206-aa030uql11c92m17c1981i25jdb70e92.apps.googleusercontent.com',
+    iosClientId:
+        '796565517206-aa030uql11c92m17c1981i25jdb70e92.apps.googleusercontent.com',
     iosBundleId: 'com.example.flutterMidtrans',
   );
 }
