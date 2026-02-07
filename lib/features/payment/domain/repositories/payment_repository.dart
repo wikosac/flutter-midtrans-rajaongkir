@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
+import '../entities/payment_request.dart';
 
 abstract class PaymentRepository {
-  Future<Either<Failure, String>> getSnapToken(String orderId, double amount, String name, String phone, String address);
+  Future<Either<Failure, String>> getSnapToken(PaymentRequest request);
 }
