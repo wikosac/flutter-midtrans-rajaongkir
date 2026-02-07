@@ -18,23 +18,34 @@ class OrderModel extends Order {
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
-      id: json['id'],
-      userId: json['userId'],
-      items: (json['items'] as List)
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      items: (json['items'] as List<dynamic>)
           .map(
-            (item) => CartItem(
-              product: ProductModel.fromJson(item['product']),
-              quantity: item['quantity'],
-            ),
+            (item) {
+              final itemMap = item as Map<String, dynamic>;
+              final productMap = itemMap['product'] as Map<String, dynamic>;
+              return CartItem(
+                product: ProductModel(
+                  id: productMap['id'] as int,
+                  title: productMap['title'] as String,
+                  price: (productMap['price'] as num).toDouble(),
+                  description: productMap['description'] as String,
+                  category: productMap['category'] as String,
+                  images: List<String>.from(productMap['images'] as List),
+                ),
+                quantity: itemMap['quantity'] as int,
+              );
+            },
           )
           .toList(),
-      totalAmount: json['totalAmount'],
-      status: json['status'],
-      transactionId: json['transactionId'],
-      createdAt: DateTime.parse(json['createdAt']),
-      shippingName: json['shippingName'],
-      shippingAddress: json['shippingAddress'],
-      shippingPhone: json['shippingPhone'],
+      totalAmount: (json['totalAmount'] as num).toDouble(),
+      status: json['status'] as String,
+      transactionId: json['transactionId'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      shippingName: json['shippingName'] as String,
+      shippingAddress: json['shippingAddress'] as String,
+      shippingPhone: json['shippingPhone'] as String,
     );
   }
 
