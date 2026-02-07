@@ -23,25 +23,21 @@ class OrderModel extends Order {
     return OrderModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
-      items: (json['items'] as List<dynamic>)
-          .map(
-            (item) {
-              final itemMap = item as Map<String, dynamic>;
-              final productMap = itemMap['product'] as Map<String, dynamic>;
-              return CartItem(
-                product: ProductModel(
-                  id: productMap['id'] as int,
-                  title: productMap['title'] as String,
-                  price: (productMap['price'] as num).toDouble(),
-                  description: productMap['description'] as String,
-                  category: productMap['category'] as String,
-                  images: List<String>.from(productMap['images'] as List),
-                ),
-                quantity: itemMap['quantity'] as int,
-              );
-            },
-          )
-          .toList(),
+      items: (json['items'] as List<dynamic>).map((item) {
+        final itemMap = item as Map<String, dynamic>;
+        final productMap = itemMap['product'] as Map<String, dynamic>;
+        return CartItem(
+          product: ProductModel(
+            id: productMap['id'] as int,
+            title: productMap['title'] as String,
+            price: (productMap['price'] as num).toDouble(),
+            description: productMap['description'] as String,
+            category: productMap['category'] as String,
+            images: List<String>.from(productMap['images'] as List),
+          ),
+          quantity: itemMap['quantity'] as int,
+        );
+      }).toList(),
       totalAmount: (json['totalAmount'] as num).toDouble(),
       status: json['status'] as String,
       transactionId: json['transactionId'] as String?,
