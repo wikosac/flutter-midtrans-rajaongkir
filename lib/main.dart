@@ -27,13 +27,20 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => di.sl<CartBloc>()),
         BlocProvider(create: (_) => di.sl<OrderBloc>()),
       ],
-      child: MaterialApp.router(
-        title: 'Flutter Midtrans',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is Authenticated) {
+            context.read<CartBloc>().add(SetUserId(state.user.id));
+          }
+        },
+        child: MaterialApp.router(
+          title: 'Flutter Midtrans',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          routerConfig: router,
         ),
-        routerConfig: router,
       ),
     );
   }

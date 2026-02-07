@@ -15,7 +15,12 @@ import 'features/products/data/repositories/product_repository_impl.dart';
 import 'features/products/domain/repositories/product_repository.dart';
 import 'features/products/presentation/bloc/product_bloc.dart';
 
+import 'features/cart/data/datasources/cart_remote_data_source.dart';
 import 'features/cart/presentation/bloc/cart_bloc.dart';
+
+import 'features/payment/data/datasources/payment_remote_data_source.dart';
+import 'features/payment/data/repositories/payment_repository_impl.dart';
+import 'features/payment/domain/repositories/payment_repository.dart';
 
 import 'features/orders/data/datasources/order_remote_data_source.dart';
 import 'features/orders/data/repositories/order_repository_impl.dart';
@@ -28,7 +33,7 @@ Future<void> init() async {
   // BLoCs
   sl.registerFactory(() => AuthBloc(authRepository: sl(), signIn: sl()));
   sl.registerFactory(() => ProductBloc(repository: sl()));
-  sl.registerFactory(() => CartBloc());
+  sl.registerFactory(() => CartBloc(remoteDataSource: sl()));
   sl.registerFactory(() => OrderBloc(repository: sl()));
 
   // Use cases
@@ -44,6 +49,9 @@ Future<void> init() async {
   sl.registerLazySingleton<OrderRepository>(
     () => OrderRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<PaymentRepository>(
+    () => PaymentRepositoryImpl(remoteDataSource: sl()),
+  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -58,6 +66,12 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<OrderRemoteDataSource>(
     () => OrderRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<CartRemoteDataSource>(
+    () => CartRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<PaymentRemoteDataSource>(
+    () => PaymentRemoteDataSourceImpl(client: sl()),
   );
 
   // External
