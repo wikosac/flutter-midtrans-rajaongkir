@@ -35,3 +35,12 @@ class GoogleSignInRequested extends AuthEvent {}
 class SignOutRequested extends AuthEvent {}
 
 class CheckAuthStatus extends AuthEvent {}
+
+class UpdateProfileRequested extends AuthEvent {
+  final User user;
+
+  UpdateProfileRequested(this.user);
+
+  @override
+  List<Object> get props => [user];
+}

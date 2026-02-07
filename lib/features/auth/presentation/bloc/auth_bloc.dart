@@ -18,6 +18,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<GoogleSignInRequested>(_onGoogleSignInRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<CheckAuthStatus>(_onCheckAuthStatus);
+    on<UpdateProfileRequested>(_onUpdateProfileRequested);
   }
 
   Future<void> _onSignInRequested(
@@ -79,6 +80,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (failure) => emit(Unauthenticated()),
       (user) =>
           user != null ? emit(Authenticated(user)) : emit(Unauthenticated()),
+    );
+  }
+
+  Future<void> _onUpdateProfileRequested(
+    UpdateProfileRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    final result = await authRepository.updateUserProfile(event.user);
+    result.fold(
+      (failure) => emit(AuthError(failure.message)),
+      (_) => emit(Authenticated(event.user)),
     );
   }
 }
