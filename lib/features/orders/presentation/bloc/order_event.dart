@@ -39,3 +39,13 @@ class UpdateOrderStatus extends OrderEvent {
   @override
   List<Object?> get props => [orderId, status, transactionId, userId];
 }
+
+class DeleteOrder extends OrderEvent {
+  final String orderId;
+  final String userId;
+
+  DeleteOrder(this.orderId, this.userId);
+
+  @override
+  List<Object> get props => [orderId, userId];
+}
