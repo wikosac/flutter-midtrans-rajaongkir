@@ -2,10 +2,7 @@ import '../../domain/entities/cart_item.dart';
 import '../../../products/data/models/product_model.dart';
 
 class CartItemModel extends CartItem {
-  const CartItemModel({
-    required super.product,
-    required super.quantity,
-  });
+  const CartItemModel({required super.product, required super.quantity});
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     final productMap = json['product'] as Map<String, dynamic>;

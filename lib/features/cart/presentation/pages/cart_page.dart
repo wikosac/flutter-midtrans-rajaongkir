@@ -44,22 +44,32 @@ class CartPage extends StatelessWidget {
                                 children: [
                                   Text(
                                     item.product.title,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
                                   Text('Category: ${item.product.category}'),
-                                  Text('\$${item.product.price.toStringAsFixed(2)}'),
+                                  Text(
+                                    '\$${item.product.price.toStringAsFixed(2)}',
+                                  ),
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
                                       IconButton(
-                                        icon: const Icon(Icons.remove, size: 20),
+                                        icon: const Icon(
+                                          Icons.remove,
+                                          size: 20,
+                                        ),
                                         onPressed: () {
                                           if (item.quantity > 1) {
                                             context.read<CartBloc>().add(
-                                              UpdateQuantity(item.product.id, item.quantity - 1),
+                                              UpdateQuantity(
+                                                item.product.id,
+                                                item.quantity - 1,
+                                              ),
                                             );
                                           }
                                         },
@@ -67,14 +77,19 @@ class CartPage extends StatelessWidget {
                                         constraints: const BoxConstraints(),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                        ),
                                         child: Text('${item.quantity}'),
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.add, size: 20),
                                         onPressed: () {
                                           context.read<CartBloc>().add(
-                                            UpdateQuantity(item.product.id, item.quantity + 1),
+                                            UpdateQuantity(
+                                              item.product.id,
+                                              item.quantity + 1,
+                                            ),
                                           );
                                         },
                                         padding: EdgeInsets.zero,
@@ -91,13 +106,21 @@ class CartPage extends StatelessWidget {
                               children: [
                                 Text(
                                   '\$${item.totalPrice.toStringAsFixed(2)}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 8),
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
                                   onPressed: () {
-                                    context.read<CartBloc>().add(RemoveFromCart(item.product.id));
+                                    context.read<CartBloc>().add(
+                                      RemoveFromCart(item.product.id),
+                                    );
                                   },
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
@@ -130,11 +153,17 @@ class CartPage extends StatelessWidget {
                       children: [
                         const Text(
                           'Total:',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           '\$${state.totalPrice.toStringAsFixed(2)}',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
