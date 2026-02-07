@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart' hide Order;
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/order.dart';
@@ -39,6 +41,7 @@ class OrderRepositoryImpl implements OrderRepository {
       final orders = await remoteDataSource.getUserOrders(userId);
       return Right(orders);
     } catch (e) {
+      log(e.toString());
       return Left(ServerFailure(e.toString()));
     }
   }

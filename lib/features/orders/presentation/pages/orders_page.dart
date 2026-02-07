@@ -20,6 +20,38 @@ class _OrdersPageState extends State<OrdersPage> {
     }
   }
 
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+      case 'completed':
+        return Colors.green;
+      case 'pending':
+        return Colors.orange;
+      case 'cancelled':
+        return Colors.red;
+      case 'processing':
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  IconData _getStatusIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+      case 'completed':
+        return Icons.check_circle;
+      case 'pending':
+        return Icons.pending;
+      case 'cancelled':
+        return Icons.cancel;
+      case 'processing':
+        return Icons.local_shipping;
+      default:
+        return Icons.info;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,17 +71,21 @@ class _OrdersPageState extends State<OrdersPage> {
                 return Card(
                   margin: const EdgeInsets.all(8),
                   child: ExpansionTile(
-                    title: Text('Order #${order.id}'),
+                    leading: Icon(_getStatusIcon(order.status), color: _getStatusColor(order.status), size: 32),
+                    title: Text('Order #${order.id.substring(order.id.length - 8)}'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Status: ${order.status}'),
-                        Text(
-                          'Total: \$${order.totalAmount.toStringAsFixed(2)}',
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(_getStatusIcon(order.status), size: 16, color: _getStatusColor(order.status)),
+                            const SizedBox(width: 4),
+                            Text('Status: ${order.status.toUpperCase()}', style: TextStyle(color: _getStatusColor(order.status), fontWeight: FontWeight.bold)),
+                          ],
                         ),
-                        Text(
-                          'Date: ${order.createdAt.toString().split('.')[0]}',
-                        ),
+                        Text('Total: \$${order.totalAmount.toStringAsFixed(2)}'),
+                        Text('Date: ${order.createdAt.toString().split('.')[0]}'),
                       ],
                     ),
                     children: [
@@ -58,26 +94,49 @@ class _OrdersPageState extends State<OrdersPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Shipping Information:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            const Divider(),
+                            const Text('Order Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.payment, color: _getStatusColor(order.status)),
+                                const SizedBox(width: 8),
+                                Text('Payment: ${order.status}'),
+                              ],
                             ),
-                            Text('Name: ${order.shippingName}'),
-                            Text('Phone: ${order.shippingPhone}'),
-                            Text('Address: ${order.shippingAddress}'),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(Icons.local_shipping, color: order.status == 'paid' ? Colors.blue : Colors.grey),
+                                const SizedBox(width: 8),
+                                Text('Shipping: ${order.status == 'paid' ? 'Processing' : 'Pending'}'),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(Icons.home, color: order.status == 'completed' ? Colors.green : Colors.grey),
+                                const SizedBox(width: 8),
+                                Text('Delivery: ${order.status == 'completed' ? 'Delivered' : 'Not yet'}'),
+                              ],
+                            ),
                             const SizedBox(height: 16),
-                            const Text(
-                              'Items:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            ...order.items.map(
-                              (item) => ListTile(
-                                title: Text(item.product.title),
-                                subtitle: Text('Quantity: ${item.quantity}'),
-                                trailing: Text(
-                                  '\$${item.totalPrice.toStringAsFixed(2)}',
-                                ),
-                              ),
+                            const Text('Shipping Information:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            const SizedBox(height: 8),
+                            ListTile(leading: const Icon(Icons.person), title: const Text('Name'), subtitle: Text(order.shippingName), dense: true),
+                            ListTile(leading: const Icon(Icons.phone), title: const Text('Phone'), subtitle: Text(order.shippingPhone), dense: true),
+                            ListTile(leading: const Icon(Icons.location_on), title: const Text('Address'), subtitle: Text(order.shippingAddress), dense: true),
+                            const SizedBox(height: 16),
+                            const Text('Items:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            ...order.items.map((item) => ListTile(
+                              title: Text(item.product.title),
+                              subtitle: Text('Quantity: ${item.quantity}'),
+                              trailing: Text('\$${item.totalPrice.toStringAsFixed(2)}'),
+                            )),
+                            const Divider(),
+                            ListTile(
+                              title: const Text('Total Amount', style: TextStyle(fontWeight: FontWeight.bold)),
+                              trailing: Text('\$${order.totalAmount.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                             ),
                           ],
                         ),
