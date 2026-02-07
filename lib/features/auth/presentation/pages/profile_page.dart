@@ -58,11 +58,42 @@ class ProfilePage extends StatelessWidget {
                   title: const Text('Address'),
                   subtitle: Text(state.user.address ?? 'Not set'),
                 ),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: () => context.push('/edit-profile'),
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Edit Profile'),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () => context.push('/orders'),
+                  icon: const Icon(Icons.receipt_long),
+                  label: const Text('My Orders'),
+                ),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(SignOutRequested());
-                    context.go('/login');
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Logout'),
+                        content: const Text('Are you sure you want to logout?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Logout'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true && context.mounted) {
+                      context.read<AuthBloc>().add(SignOutRequested());
+                      context.go('/login');
+                    }
                   },
                   icon: const Icon(Icons.logout),
                   label: const Text('Logout'),

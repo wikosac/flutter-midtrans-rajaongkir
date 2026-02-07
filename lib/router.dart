@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/edit_profile_page.dart';
 import 'features/navigation/main_navigation_page.dart';
 import 'features/cart/presentation/pages/cart_page.dart';
 import 'features/payment/presentation/pages/checkout_page.dart';
@@ -13,6 +14,10 @@ final router = GoRouter(
     GoRoute(
       path: '/products',
       builder: (context, state) => const MainNavigationPage(),
+    ),
+    GoRoute(
+      path: '/edit-profile',
+      builder: (context, state) => const EditProfilePage(),
     ),
     GoRoute(path: '/cart', builder: (context, state) => const CartPage()),
     GoRoute(
