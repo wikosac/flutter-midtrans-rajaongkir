@@ -6,6 +6,9 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../../orders/domain/entities/order.dart';
 import '../../../orders/presentation/bloc/order_bloc.dart';
+import '../../domain/entities/payment_request.dart';
+import '../../domain/entities/item_detail.dart';
+import '../../domain/entities/transaction_details.dart';
 import '../../domain/repositories/payment_repository.dart';
 import '../../../../injection_container.dart' as di;
 
@@ -85,7 +88,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               const SizedBox(height: 24),
               BlocBuilder<CartBloc, CartState>(
                 builder: (context, cartState) {
-                  double idrTotal = cartState.totalPrice * 16848.0;
+                  double idrTotal = cartState.totalPrice * 16848;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -101,35 +104,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         (item) => ListTile(
                           title: Text(item.product.title),
                           subtitle: Text('Quantity: ${item.quantity}'),
-                          trailing: Text(
-                            '\$${item.totalPrice.toStringAsFixed(2)}',
-                          ),
+                          trailing: Text(formatRupiah(item.totalPrice * 16848)),
                         ),
                       ),
                       const Divider(),
-                      ListTile(
-                        title: const Text(
-                          'Total (USD)',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        trailing: Text(
-                          '\$${cartState.totalPrice.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
                       ListTile(
                         title: const Text(
                           'Total (IDR)',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
-                            color: Colors.green,
                           ),
                         ),
                         trailing: Text(
@@ -137,7 +121,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
-                            color: Colors.green,
                           ),
                         ),
                       ),
@@ -153,15 +136,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 'ORDER-${DateTime.now().millisecondsSinceEpoch}';
 
                             try {
+                              final request = PaymentRequest(
+                                transactionDetails: TransactionDetails(
+                                  orderId: orderId,
+                                  grossAmount: idrTotal.toInt(),
+                                ),
+                                itemDetails: cartState.items
+                                    .map(
+                                      (item) => ItemDetail(
+                                        id: item.product.id.toString(),
+                                        name: item.product.title,
+                                        price: (item.product.price * 16848)
+                                            .toInt(),
+                                        quantity: item.quantity,
+                                        category: item.product.category,
+                                      ),
+                                    )
+                                    .toList(),
+                              );
+
                               final result = await di
                                   .sl<PaymentRepository>()
-                                  .getSnapToken(
-                                    orderId,
-                                    idrTotal,
-                                    _nameController.text,
-                                    _phoneController.text,
-                                    _addressController.text,
-                                  );
+                                  .getSnapToken(request);
 
                               result.fold(
                                 (failure) {
@@ -177,6 +173,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     items: cartState.items,
                                     totalAmount: cartState.totalPrice,
                                     status: 'pending',
+                                    transactionId: snapToken,
                                     createdAt: DateTime.now(),
                                     shippingName: _nameController.text,
                                     shippingAddress: _addressController.text,
@@ -188,7 +185,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     CreateOrder(order),
                                   );
                                   context.read<CartBloc>().add(ClearCart());
-                                  context.push(
+                                  context.pushReplacement(
                                     '/payment?snapToken=$snapToken&orderId=$orderId',
                                   );
                                 },

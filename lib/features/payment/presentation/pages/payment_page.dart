@@ -89,7 +89,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        context.go('/products');
+        context.pop();
         return false;
       },
       child: Scaffold(
@@ -97,7 +97,7 @@ class _PaymentPageState extends State<PaymentPage> {
           title: const Text('Payment'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.go('/products'),
+            onPressed: () => context.pop(),
           ),
         ),
         body: WebViewWidget(controller: _controller),
