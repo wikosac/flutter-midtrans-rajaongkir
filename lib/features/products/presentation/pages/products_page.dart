@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../domain/entities/product.dart';
 import '../bloc/product_bloc.dart';
@@ -27,6 +30,11 @@ class _ProductsPageState extends State<ProductsPage> {
   void initState() {
     super.initState();
     context.read<ProductBloc>().add(LoadProducts());
+    final authState = context.read<AuthBloc>().state;
+    if (authState is Authenticated) {
+      log('User ID: ${authState.user.id}');
+      context.read<CartBloc>().add(SetUserId(authState.user.id));
+    }
   }
 
   @override
@@ -65,10 +73,6 @@ class _ProductsPageState extends State<ProductsPage> {
                 ],
               );
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.receipt),
-            onPressed: () => context.push('/orders'),
           ),
         ],
       ),

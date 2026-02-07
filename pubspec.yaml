@@ -59,6 +59,7 @@ dependencies:
   # Midtrans
   webview_flutter: ^4.4.4
   url_launcher: ^6.2.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
