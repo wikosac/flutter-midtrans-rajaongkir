@@ -34,3 +34,14 @@ class UpdateQuantity extends CartEvent {
 }
 
 class ClearCart extends CartEvent {}
+
+class LoadCart extends CartEvent {}
+
+class SetUserId extends CartEvent {
+  final String userId;
+
+  SetUserId(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}
