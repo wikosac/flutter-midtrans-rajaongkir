@@ -59,4 +59,14 @@ class OrderRepositoryImpl implements OrderRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> deleteOrder(String orderId) async {
+    try {
+      await remoteDataSource.deleteOrder(orderId);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

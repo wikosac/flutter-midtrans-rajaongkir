@@ -11,6 +11,7 @@ abstract class OrderRemoteDataSource {
     String status,
     String? transactionId,
   );
+  Future<void> deleteOrder(String orderId);
 }
 
 class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
@@ -45,5 +46,11 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
       'status': status,
       if (transactionId != null) 'transactionId': transactionId,
     });
+  }
+
+  @override
+  Future<void> deleteOrder(String orderId) async {
+    log('Deleting order with ID: $orderId');
+    await firestore.collection('orders').doc(orderId).delete();
   }
 }

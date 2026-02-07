@@ -74,7 +74,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           phone: _phoneController.text,
                           address: _addressController.text,
                         );
-                        context.read<AuthBloc>().add(UpdateProfileRequested(updatedUser));
+                        context.read<AuthBloc>().add(
+                          UpdateProfileRequested(updatedUser),
+                        );
                         context.pop();
                       },
                       child: const Text('Save'),

@@ -10,4 +10,5 @@ abstract class OrderRepository {
     String status,
     String? transactionId,
   );
+  Future<Either<Failure, void>> deleteOrder(String orderId);
 }

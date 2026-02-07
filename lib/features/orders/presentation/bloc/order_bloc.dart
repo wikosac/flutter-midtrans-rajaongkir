@@ -13,6 +13,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     on<CreateOrder>(_onCreateOrder);
     on<LoadUserOrders>(_onLoadUserOrders);
     on<UpdateOrderStatus>(_onUpdateOrderStatus);
+    on<DeleteOrder>(_onDeleteOrder);
   }
 
   Future<void> _onCreateOrder(
@@ -48,6 +49,17 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       event.status,
       event.transactionId,
     );
+    result.fold(
+      (failure) => emit(OrderError(failure.message)),
+      (_) => add(LoadUserOrders(event.userId)),
+    );
+  }
+
+  Future<void> _onDeleteOrder(
+    DeleteOrder event,
+    Emitter<OrderState> emit,
+  ) async {
+    final result = await repository.deleteOrder(event.orderId);
     result.fold(
       (failure) => emit(OrderError(failure.message)),
       (_) => add(LoadUserOrders(event.userId)),
