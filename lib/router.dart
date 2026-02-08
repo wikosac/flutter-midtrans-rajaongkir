@@ -6,6 +6,7 @@ import 'features/cart/presentation/pages/cart_page.dart';
 import 'features/payment/presentation/pages/checkout_page.dart';
 import 'features/payment/presentation/pages/payment_page.dart';
 import 'features/orders/presentation/pages/orders_page.dart';
+import 'features/products/presentation/pages/product_detail_page.dart';
 
 final router = GoRouter(
   initialLocation: '/login',
@@ -14,6 +15,13 @@ final router = GoRouter(
     GoRoute(
       path: '/products',
       builder: (context, state) => const MainNavigationPage(),
+    ),
+    GoRoute(
+      path: '/product-detail',
+      builder: (context, state) {
+        final productId = int.parse(state.uri.queryParameters['id'] ?? '0');
+        return ProductDetailPage(productId: productId);
+      },
     ),
     GoRoute(
       path: '/edit-profile',
