@@ -1,6 +1,7 @@
 import '../../../cart/domain/entities/cart_item.dart';
 import '../../../products/data/models/product_model.dart';
 import '../../domain/entities/order.dart';
+import '../../domain/entities/notification.dart';
 
 class OrderModel extends Order {
   const OrderModel({
@@ -14,6 +15,7 @@ class OrderModel extends Order {
     required super.shippingName,
     required super.shippingAddress,
     required super.shippingPhone,
+    super.lastNotification,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,9 @@ class OrderModel extends Order {
       shippingName: json['shippingName'] as String,
       shippingAddress: json['shippingAddress'] as String,
       shippingPhone: json['shippingPhone'] as String,
+      lastNotification: json['lastNotification'] != null
+          ? Notification.fromJson(json['lastNotification'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -71,6 +76,7 @@ class OrderModel extends Order {
       'shippingName': shippingName,
       'shippingAddress': shippingAddress,
       'shippingPhone': shippingPhone,
+      'lastNotification': lastNotification?.toJson(),
     };
   }
 }

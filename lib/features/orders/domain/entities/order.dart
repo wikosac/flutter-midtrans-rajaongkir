@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../../cart/domain/entities/cart_item.dart';
+import 'notification.dart';
 
 class Order extends Equatable {
   final String id;
@@ -12,6 +13,7 @@ class Order extends Equatable {
   final String shippingName;
   final String shippingAddress;
   final String shippingPhone;
+  final Notification? lastNotification;
 
   const Order({
     required this.id,
@@ -24,6 +26,7 @@ class Order extends Equatable {
     required this.shippingName,
     required this.shippingAddress,
     required this.shippingPhone,
+    this.lastNotification,
   });
 
   @override
