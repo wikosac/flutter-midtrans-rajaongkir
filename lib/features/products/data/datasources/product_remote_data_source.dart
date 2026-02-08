@@ -6,6 +6,7 @@ abstract class ProductRemoteDataSource {
   Future<List<ProductModel>> getProducts();
   Future<List<ProductModel>> getProductsByCategory(int categoryId);
   Future<List<String>> getCategories();
+  Future<ProductModel> getProductById(int id);
 }
 
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
@@ -44,5 +45,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       return jsonList.map((json) => json['name'] as String).toList();
     }
     throw Exception('Failed to load categories');
+  }
+
+  @override
+  Future<ProductModel> getProductById(int id) async {
+    final response = await client.get(Uri.parse('$baseUrl/products/$id'));
+    if (response.statusCode == 200) {
+      return ProductModel.fromJson(json.decode(response.body));
+    }
+    throw Exception('Failed to load product');
   }
 }
