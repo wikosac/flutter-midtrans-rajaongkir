@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 
@@ -56,19 +57,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> signInWithGoogle() async {
+    await googleSignIn.initialize(
+      serverClientId: dotenv.env['GOOGLE_WEB_CLIENT_ID'],
+    );
     final googleUser = await googleSignIn.authenticate(scopeHint: ['email']);
-    log('Google User: $googleUser');
-    final googleAuth = googleUser.authentication;
     final authClient = googleUser.authorizationClient;
     final authorization = await authClient.authorizationForScopes(['email']);
-    log('Authorization: $authorization, googleAuth: $googleAuth');
     final credential = firebase_auth.GoogleAuthProvider.credential(
       accessToken: authorization?.accessToken,
-      idToken: googleAuth.idToken,
+      idToken: googleUser.authentication.idToken,
     );
-    log('Credential: $credential');
     final userCredential = await firebaseAuth.signInWithCredential(credential);
-    log('UserCredential: $userCredential');
 
     final doc = await firestore
         .collection('users')
