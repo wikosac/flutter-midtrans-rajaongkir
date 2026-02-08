@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../../orders/domain/entities/order.dart';
@@ -11,6 +10,7 @@ import '../../domain/entities/item_detail.dart';
 import '../../domain/entities/transaction_details.dart';
 import '../../domain/repositories/payment_repository.dart';
 import '../../../../injection_container.dart' as di;
+import '../../../../core/utils/currency_formatter.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -209,15 +209,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       ),
     );
-  }
-
-  String formatRupiah(num value) {
-    final formatter = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp',
-      decimalDigits: 0,
-    );
-    return formatter.format(value);
   }
 
   @override
