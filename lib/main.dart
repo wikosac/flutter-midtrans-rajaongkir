@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'injection_container.dart' as di;
 import 'router.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
@@ -11,6 +12,7 @@ import 'features/orders/presentation/bloc/order_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await dotenv.load(fileName: ".env");
   await di.init();
   runApp(const MyApp());
 }
