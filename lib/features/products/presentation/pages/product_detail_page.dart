@@ -2,62 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../domain/entities/product.dart';
-import '../../domain/repositories/product_repository.dart';
 import '../../../cart/presentation/bloc/cart_bloc.dart';
-import '../../../../injection_container.dart' as di;
+import '../bloc/product_detail_bloc.dart';
 
-class ProductDetailPage extends StatefulWidget {
+class ProductDetailPage extends StatelessWidget {
   final int productId;
 
   const ProductDetailPage({super.key, required this.productId});
 
   @override
-  State<ProductDetailPage> createState() => _ProductDetailPageState();
-}
-
-class _ProductDetailPageState extends State<ProductDetailPage> {
-  int _currentImageIndex = 0;
-  Product? _product;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProduct();
-  }
-
-  Future<void> _loadProduct() async {
-    final result = await di.sl<ProductRepository>().getProductById(
-      widget.productId,
-    );
-    result.fold(
-      (failure) => setState(() {
-        _error = failure.message;
-        _isLoading = false;
-      }),
-      (product) => setState(() {
-        _product = product;
-        _isLoading = false;
-      }),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Product Detail')),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-          ? Center(child: Text(_error!))
-          : _buildContent(),
+    return BlocProvider(
+      create: (context) =>
+          context.read<ProductDetailBloc>()..add(LoadProductDetail(productId)),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Product Detail')),
+        body: BlocBuilder<ProductDetailBloc, ProductDetailState>(
+          builder: (context, state) {
+            if (state is ProductDetailLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is ProductDetailError) {
+              return Center(child: Text(state.message));
+            }
+            if (state is ProductDetailLoaded) {
+              return _buildContent(
+                context,
+                state.product,
+                state.currentImageIndex,
+              );
+            }
+            return const SizedBox();
+          },
+        ),
+      ),
     );
   }
 
-  Widget _buildContent() {
-    if (_product == null) return const SizedBox();
-
+  Widget _buildContent(
+    BuildContext context,
+    Product product,
+    int currentImageIndex,
+  ) {
     return Column(
       children: [
         Expanded(
@@ -68,12 +54,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 SizedBox(
                   height: 300,
                   child: PageView.builder(
-                    itemCount: _product!.images.length,
-                    onPageChanged: (index) =>
-                        setState(() => _currentImageIndex = index),
+                    itemCount: product.images.length,
+                    onPageChanged: (index) => context
+                        .read<ProductDetailBloc>()
+                        .add(ImageIndexChanged(index)),
                     itemBuilder: (context, index) {
                       return CachedNetworkImage(
-                        imageUrl: _product!.images[index],
+                        imageUrl: product.images[index],
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
                             const Center(child: CircularProgressIndicator()),
@@ -83,20 +70,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     },
                   ),
                 ),
-                if (_product!.images.length > 1)
+                if (product.images.length > 1)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        _product!.images.length,
+                        product.images.length,
                         (index) => Container(
                           margin: const EdgeInsets.symmetric(horizontal: 4),
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: _currentImageIndex == index
+                            color: currentImageIndex == index
                                 ? const Color(0xFF6366F1)
                                 : Colors.grey,
                           ),
@@ -110,7 +97,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _product!.title,
+                        product.title,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -118,7 +105,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '\$${_product!.price.toStringAsFixed(2)}',
+                        '\$${product.price.toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -126,7 +113,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Chip(label: Text(_product!.category)),
+                      Chip(label: Text(product.category)),
                       const SizedBox(height: 16),
                       const Text(
                         'Description',
@@ -137,7 +124,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        _product!.description,
+                        product.description,
                         style: const TextStyle(fontSize: 16, height: 1.5),
                       ),
                     ],
@@ -165,7 +152,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  context.read<CartBloc>().add(AddToCart(_product!));
+                  context.read<CartBloc>().add(AddToCart(product));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Added to cart')),
                   );

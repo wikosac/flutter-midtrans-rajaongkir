@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -52,6 +54,7 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _handlePaymentSuccess() {
+    log('Payment ${widget.orderId} successful with token: ${widget.snapToken}');
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
       context.read<OrderBloc>().add(
@@ -87,10 +90,12 @@ class _PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        context.pop();
-        return false;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          context.pop();
+        }
       },
       child: Scaffold(
         appBar: AppBar(

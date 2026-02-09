@@ -21,16 +21,17 @@ abstract class RajaOngkirRemoteDataSource {
 
 class RajaOngkirRemoteDataSourceImpl implements RajaOngkirRemoteDataSource {
   final http.Client client;
+  final apiKey = dotenv.env['SHIPPING_DELIVERY_API_KEY'] ?? '';
+  static const baseUrl =
+      'https://api-sandbox.collaborator.komerce.id/tariff/api/v1';
 
   RajaOngkirRemoteDataSourceImpl({required this.client});
 
   @override
   Future<List<DestinationModel>> searchDestinations(String query) async {
     final response = await client.get(
-      Uri.parse(
-        'https://rajaongkir.komerce.id/api/v1/destination/domestic-destination?search=$query',
-      ),
-      headers: {'key': dotenv.env['SHIPPING_COST_API_KEY'] ?? ''},
+      Uri.parse('$baseUrl/destination/search?keyword=$query'),
+      headers: {'x-api-key': apiKey},
     );
     final data = json.decode(response.body);
 
@@ -51,9 +52,9 @@ class RajaOngkirRemoteDataSourceImpl implements RajaOngkirRemoteDataSource {
   }) async {
     final response = await client.get(
       Uri.parse(
-        'https://api-sandbox.collaborator.komerce.id/tariff/api/v1/calculate?shipper_destination_id=$shipperDestinationId&receiver_destination_id=$receiverDestinationId&weight=$weight&item_value=$itemValue',
+        '$baseUrl/calculate?shipper_destination_id=$shipperDestinationId&receiver_destination_id=$receiverDestinationId&weight=$weight&item_value=$itemValue',
       ),
-      headers: {'x-api-key': dotenv.env['SHIPPING_DELIVERY_API_KEY'] ?? ''},
+      headers: {'x-api-key': apiKey},
     );
     final data = json.decode(response.body);
 

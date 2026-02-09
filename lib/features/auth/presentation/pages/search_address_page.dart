@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_midtrans/features/shipping/data/datasources/rajaongkir_remote_data_source.dart';
-import 'package:flutter_midtrans/features/shipping/data/repositories/shipping_repository_impl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_midtrans/features/shipping/domain/entities/destination.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
+import '../bloc/address_search_bloc.dart';
 
 class SearchAddressPage extends StatefulWidget {
   const SearchAddressPage({super.key});
@@ -14,50 +13,6 @@ class SearchAddressPage extends StatefulWidget {
 
 class _SearchAddressPageState extends State<SearchAddressPage> {
   final _searchController = TextEditingController();
-  List<Destination> _destinations = [];
-  bool _isLoading = false;
-  late final ShippingRepositoryImpl _repository;
-
-  @override
-  void initState() {
-    super.initState();
-    final dataSource = RajaOngkirRemoteDataSourceImpl(client: http.Client());
-    _repository = ShippingRepositoryImpl(remoteDataSource: dataSource);
-  }
-
-  void _searchDestinations(String query) async {
-    if (query.isEmpty || query.length < 3) {
-      setState(() {
-        _destinations = [];
-      });
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final result = await _repository.searchDestinations(query.trim());
-
-    result.fold(
-      (failure) {
-        setState(() {
-          _isLoading = false;
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(failure.message)));
-        }
-      },
-      (destinations) {
-        setState(() {
-          _destinations = destinations;
-          _isLoading = false;
-        });
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,22 +39,33 @@ class _SearchAddressPageState extends State<SearchAddressPage> {
             borderRadius: BorderRadius.circular(8),
           ),
         ),
-        onSubmitted: _searchDestinations,
+        onSubmitted: (query) => context.read<AddressSearchBloc>().add(SearchAddressRequested(query)),
         textInputAction: TextInputAction.search,
       ),
     );
   }
 
   Widget _buildResultsList() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_destinations.isEmpty) {
-      return const Center(child: Text('Search for a destination'));
-    }
-    return ListView.builder(
-      itemCount: _destinations.length,
-      itemBuilder: (context, index) => _buildDestinationItem(_destinations[index]),
+    return BlocConsumer<AddressSearchBloc, AddressSearchState>(
+      listener: (context, state) {
+        if (state is AddressSearchError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state is AddressSearchLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state is AddressSearchLoaded) {
+          return ListView.builder(
+            itemCount: state.destinations.length,
+            itemBuilder: (context, index) => _buildDestinationItem(state.destinations[index]),
+          );
+        }
+        return const Center(child: Text('Search for a destination'));
+      },
     );
   }
 

@@ -9,11 +9,14 @@ import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/sign_in.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_form_bloc.dart';
+import 'features/auth/presentation/bloc/address_search_bloc.dart';
 
 import 'features/products/data/datasources/product_remote_data_source.dart';
 import 'features/products/data/repositories/product_repository_impl.dart';
 import 'features/products/domain/repositories/product_repository.dart';
 import 'features/products/presentation/bloc/product_bloc.dart';
+import 'features/products/presentation/bloc/product_detail_bloc.dart';
 
 import 'features/cart/data/datasources/cart_remote_data_source.dart';
 import 'features/cart/presentation/bloc/cart_bloc.dart';
@@ -21,20 +24,32 @@ import 'features/cart/presentation/bloc/cart_bloc.dart';
 import 'features/payment/data/datasources/payment_remote_data_source.dart';
 import 'features/payment/data/repositories/payment_repository_impl.dart';
 import 'features/payment/domain/repositories/payment_repository.dart';
+import 'features/payment/presentation/bloc/checkout_bloc.dart';
 
 import 'features/orders/data/datasources/order_remote_data_source.dart';
 import 'features/orders/data/repositories/order_repository_impl.dart';
 import 'features/orders/domain/repositories/order_repository.dart';
 import 'features/orders/presentation/bloc/order_bloc.dart';
 
+import 'features/shipping/data/datasources/rajaongkir_remote_data_source.dart';
+import 'features/shipping/data/repositories/shipping_repository_impl.dart';
+import 'features/shipping/domain/repositories/shipping_repository.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
   // BLoCs
   sl.registerFactory(() => AuthBloc(authRepository: sl(), signIn: sl()));
+  sl.registerFactory(() => AuthFormBloc());
+  sl.registerFactory(() => AddressSearchBloc(repository: sl()));
   sl.registerFactory(() => ProductBloc(repository: sl()));
+  sl.registerFactory(() => ProductDetailBloc(repository: sl()));
   sl.registerFactory(() => CartBloc(remoteDataSource: sl()));
   sl.registerFactory(() => OrderBloc(repository: sl()));
+  sl.registerFactory(() => CheckoutBloc(
+        shippingRepository: sl(),
+        paymentRepository: sl(),
+      ));
 
   // Use cases
   sl.registerLazySingleton(() => SignIn(sl()));
@@ -51,6 +66,9 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<PaymentRepository>(
     () => PaymentRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<ShippingRepository>(
+    () => ShippingRepositoryImpl(remoteDataSource: sl()),
   );
 
   // Data sources
@@ -72,6 +90,9 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<PaymentRemoteDataSource>(
     () => PaymentRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<RajaOngkirRemoteDataSource>(
+    () => RajaOngkirRemoteDataSourceImpl(client: sl()),
   );
 
   // External
