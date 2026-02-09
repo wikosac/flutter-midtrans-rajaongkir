@@ -22,6 +22,11 @@ import 'features/products/presentation/bloc/category_bloc.dart';
 import 'features/cart/data/datasources/cart_remote_data_source.dart';
 import 'features/cart/presentation/bloc/cart_bloc.dart';
 
+import 'features/payment/data/datasources/payment_remote_data_source.dart';
+import 'features/payment/data/repositories/payment_repository_impl.dart';
+import 'features/payment/domain/repositories/payment_repository.dart';
+import 'features/payment/presentation/bloc/checkout_bloc.dart';
+
 import 'features/orders/data/datasources/order_remote_data_source.dart';
 import 'features/orders/data/repositories/order_repository_impl.dart';
 import 'features/orders/domain/repositories/order_repository.dart';
@@ -39,7 +44,9 @@ Future<void> init() async {
   sl.registerFactory(() => AuthFormBloc());
   sl.registerFactory(() => AddressSearchBloc(repository: sl()));
   sl.registerFactory(() => ProductBloc(repository: sl()));
-  sl.registerFactory(() => CartBloc());
+  sl.registerFactory(() => ProductDetailBloc(repository: sl()));
+  sl.registerFactory(() => CategoryBloc(repository: sl()));
+  sl.registerFactory(() => CartBloc(remoteDataSource: sl()));
   sl.registerFactory(() => OrderBloc(repository: sl()));
   sl.registerFactory(
     () => CheckoutBloc(shippingRepository: sl(), paymentRepository: sl()),
@@ -58,6 +65,12 @@ Future<void> init() async {
   sl.registerLazySingleton<OrderRepository>(
     () => OrderRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<PaymentRepository>(
+    () => PaymentRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<ShippingRepository>(
+    () => ShippingRepositoryImpl(remoteDataSource: sl()),
+  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -72,6 +85,15 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<OrderRemoteDataSource>(
     () => OrderRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<CartRemoteDataSource>(
+    () => CartRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<PaymentRemoteDataSource>(
+    () => PaymentRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<RajaOngkirRemoteDataSource>(
+    () => RajaOngkirRemoteDataSourceImpl(client: sl()),
   );
 
   // External

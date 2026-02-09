@@ -35,7 +35,7 @@ class CheckoutPage extends StatelessWidget {
           bloc.add(
             LoadShippingServices(
               receiverDestinationId: authState.user.address?.id ?? 0,
-              itemValue: cartState.totalPrice * 16848,
+              itemValue: (cartState.totalPrice * 16848).toInt(),
             ),
           );
         }
