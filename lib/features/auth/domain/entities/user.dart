@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_midtrans/features/shipping/domain/entities/destination.dart';
 
 class User extends Equatable {
   final String id;
   final String email;
   final String name;
   final String? phone;
-  final String? address;
+  final Destination? address;
 
   const User({
     required this.id,

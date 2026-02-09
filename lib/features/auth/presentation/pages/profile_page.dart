@@ -56,7 +56,7 @@ class ProfilePage extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.location_on),
                   title: const Text('Address'),
-                  subtitle: Text(state.user.address ?? 'Not set'),
+                  subtitle: Text(state.user.address?.label ?? 'Not set'),
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(

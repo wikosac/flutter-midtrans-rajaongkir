@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_midtrans/features/shipping/domain/entities/destination.dart';
 import 'package:go_router/go_router.dart';
 import '../../domain/entities/user.dart';
 import '../bloc/auth_bloc.dart';
@@ -14,7 +15,8 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
+
+  Destination? _selectedAddress;
 
   @override
   void initState() {
@@ -23,7 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (authState is Authenticated) {
       _nameController.text = authState.user.name;
       _phoneController.text = authState.user.phone ?? '';
-      _addressController.text = authState.user.address ?? '';
+      _selectedAddress = authState.user.address;
     }
   }
 
@@ -54,12 +56,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextField(
-                    controller: _addressController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Address',
-                      border: OutlineInputBorder(),
+                  InkWell(
+                    onTap: () async {
+                      final result = await context.push<Destination>('/search-address');
+                      if (result != null) {
+                        setState(() {
+                          _selectedAddress = result;
+                        });
+                      }
+                    },
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Address',
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.search),
+                      ),
+                      child: Text(
+                        _selectedAddress == null
+                            ? 'Tap to search address'
+                            : _selectedAddress!.label ?? '',
+                        style: TextStyle(
+                          color: _selectedAddress == null
+                              ? Colors.grey
+                              : Colors.black,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -72,7 +93,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           email: state.user.email,
                           name: _nameController.text,
                           phone: _phoneController.text,
-                          address: _addressController.text,
+                          address: _selectedAddress,
                         );
                         context.read<AuthBloc>().add(
                           UpdateProfileRequested(updatedUser),
@@ -96,7 +117,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 }

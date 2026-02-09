@@ -1,3 +1,5 @@
+import 'package:flutter_midtrans/features/shipping/data/models/destination_model.dart';
+
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -15,7 +17,9 @@ class UserModel extends User {
       email: json['email'],
       name: json['name'],
       phone: json['phone'],
-      address: json['address'],
+      address: json['address'] != null && json['address'] == {}
+          ? DestinationModel.fromJson(json['address'])
+          : null,
     );
   }
 
@@ -25,7 +29,7 @@ class UserModel extends User {
       'email': email,
       'name': name,
       'phone': phone,
-      'address': address,
+      'address': address != null ? DestinationModel.fromEntity(address!).toJson() : null,
     };
   }
 }

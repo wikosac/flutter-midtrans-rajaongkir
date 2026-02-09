@@ -20,18 +20,18 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
+  String _shippingName = '';
+  String _shippingPhone = '';
+  String _shippingAddress = '';
 
   @override
   void initState() {
     super.initState();
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
-      _nameController.text = authState.user.name;
-      _phoneController.text = authState.user.phone ?? '';
-      _addressController.text = authState.user.address ?? '';
+      _shippingName = authState.user.name;
+      _shippingPhone = authState.user.phone ?? '';
+      _shippingAddress = authState.user.address?.label ?? '';
     }
   }
 
@@ -61,28 +61,40 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Full Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _addressController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Address',
-                  border: OutlineInputBorder(),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.person, size: 20),
+                          const SizedBox(width: 8),
+                          Text(_shippingName, style: const TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone, size: 20),
+                          const SizedBox(width: 8),
+                          Text(_shippingPhone, style: const TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.location_on, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(_shippingAddress, style: const TextStyle(fontSize: 16)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -175,9 +187,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     status: 'pending',
                                     transactionId: snapToken,
                                     createdAt: DateTime.now(),
-                                    shippingName: _nameController.text,
-                                    shippingAddress: _addressController.text,
-                                    shippingPhone: _phoneController.text,
+                                    shippingName: _shippingName,
+                                    shippingAddress: _shippingAddress,
+                                    shippingPhone: _shippingPhone,
                                   );
 
                                   if (!mounted) return;
@@ -209,13 +221,5 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
-    super.dispose();
   }
 }
