@@ -28,7 +28,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> _loadProduct() async {
-    final result = await di.sl<ProductRepository>().getProductById(widget.productId);
+    final result = await di.sl<ProductRepository>().getProductById(
+      widget.productId,
+    );
     result.fold(
       (failure) => setState(() {
         _error = failure.message;
@@ -48,8 +50,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text(_error!))
-              : _buildContent(),
+          ? Center(child: Text(_error!))
+          : _buildContent(),
     );
   }
 

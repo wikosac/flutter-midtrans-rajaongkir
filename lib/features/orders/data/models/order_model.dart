@@ -45,7 +45,9 @@ class OrderModel extends Order {
       shippingAddress: json['shippingAddress'] as String,
       shippingPhone: json['shippingPhone'] as String,
       lastNotification: json['lastNotification'] != null
-          ? Notification.fromJson(json['lastNotification'] as Map<String, dynamic>)
+          ? Notification.fromJson(
+              json['lastNotification'] as Map<String, dynamic>,
+            )
           : null,
     );
   }
