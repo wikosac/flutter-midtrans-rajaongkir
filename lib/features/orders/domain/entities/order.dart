@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../../cart/domain/entities/cart_item.dart';
+import '../../../shipping/domain/entities/destination.dart';
 import 'notification.dart';
 
 class Order extends Equatable {
@@ -11,7 +12,7 @@ class Order extends Equatable {
   final String? transactionId;
   final DateTime createdAt;
   final String shippingName;
-  final String shippingAddress;
+  final Destination? shippingAddress;
   final String shippingPhone;
   final Notification? lastNotification;
 

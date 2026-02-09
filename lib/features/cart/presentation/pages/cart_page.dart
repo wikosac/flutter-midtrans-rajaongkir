@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../bloc/cart_bloc.dart';
 
 class CartPage extends StatelessWidget {
@@ -172,7 +173,38 @@ class CartPage extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          context.push('/checkout');
+                          final authState = context.read<AuthBloc>().state;
+                          if (authState is Authenticated) {
+                            final user = authState.user;
+                            if (user.phone == null ||
+                                user.phone!.isEmpty ||
+                                user.address == null) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Complete Your Profile'),
+                                  content: const Text(
+                                    'Please add your phone number and address before checkout.',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        context.push('/edit-profile');
+                                      },
+                                      child: const Text('Edit Profile'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              context.push('/checkout');
+                            }
+                          }
                         },
                         child: const Text('Proceed to Checkout'),
                       ),

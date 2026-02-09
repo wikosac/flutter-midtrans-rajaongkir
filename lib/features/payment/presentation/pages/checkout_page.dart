@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_midtrans/features/shipping/domain/entities/destination.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../../orders/domain/entities/order.dart';
 import '../../../orders/presentation/bloc/order_bloc.dart';
+import '../../../shipping/data/datasources/rajaongkir_remote_data_source.dart';
+import '../../../shipping/data/repositories/shipping_repository_impl.dart';
+import '../../../shipping/domain/entities/shipping_service.dart';
 import '../../domain/entities/payment_request.dart';
 import '../../domain/entities/item_detail.dart';
 import '../../domain/entities/transaction_details.dart';
@@ -22,17 +27,64 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   String _shippingName = '';
   String _shippingPhone = '';
-  String _shippingAddress = '';
+  Destination? _shippingAddress;
+  List<ShippingService> _shippingServices = [];
+  ShippingService? _selectedService;
+  bool _isLoadingServices = false;
+  late final ShippingRepositoryImpl _shippingRepository;
 
   @override
   void initState() {
     super.initState();
+    final dataSource = RajaOngkirRemoteDataSourceImpl(client: http.Client());
+    _shippingRepository = ShippingRepositoryImpl(remoteDataSource: dataSource);
+
     final authState = context.read<AuthBloc>().state;
+    final cartState = context.read<CartBloc>().state;
     if (authState is Authenticated) {
       _shippingName = authState.user.name;
       _shippingPhone = authState.user.phone ?? '';
-      _shippingAddress = authState.user.address?.label ?? '';
+      _shippingAddress = authState.user.address;
+      _loadShippingServices(
+        authState.user.address?.id ?? 0,
+        (cartState.totalPrice * 16848).toInt(),
+      );
     }
+  }
+
+  Future<void> _loadShippingServices(
+    int receiverDestinationId,
+    int itemValue,
+  ) async {
+    setState(() {
+      _isLoadingServices = true;
+    });
+
+    final result = await _shippingRepository.getShippingServices(
+      shipperDestinationId: 17477,
+      receiverDestinationId: receiverDestinationId,
+      weight: 1,
+      itemValue: itemValue,
+    );
+
+    result.fold(
+      (failure) {
+        setState(() {
+          _isLoadingServices = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(failure.message)));
+        }
+      },
+      (services) {
+        setState(() {
+          _shippingServices = services;
+          _isLoadingServices = false;
+        });
+      },
+    );
   }
 
   @override
@@ -71,7 +123,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         children: [
                           const Icon(Icons.person, size: 20),
                           const SizedBox(width: 8),
-                          Text(_shippingName, style: const TextStyle(fontSize: 16)),
+                          Text(
+                            _shippingName,
+                            style: const TextStyle(fontSize: 16),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -79,7 +134,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         children: [
                           const Icon(Icons.phone, size: 20),
                           const SizedBox(width: 8),
-                          Text(_shippingPhone, style: const TextStyle(fontSize: 16)),
+                          Text(
+                            _shippingPhone,
+                            style: const TextStyle(fontSize: 16),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -89,7 +147,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           const Icon(Icons.location_on, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text(_shippingAddress, style: const TextStyle(fontSize: 16)),
+                            child: Text(
+                              _shippingAddress?.label ?? '',
+                              style: const TextStyle(fontSize: 16),
+                            ),
                           ),
                         ],
                       ),
@@ -98,9 +159,90 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
               const SizedBox(height: 24),
+              const Text(
+                'Shipping Service',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              _isLoadingServices
+                  ? const Center(child: CircularProgressIndicator())
+                  : _shippingServices.isEmpty
+                  ? const Text('No shipping services available')
+                  : SizedBox(
+                      height: 84,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _shippingServices.length,
+                        itemBuilder: (context, index) {
+                          final service = _shippingServices[index];
+                          final isSelected = _selectedService == service;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedService = service;
+                              });
+                            },
+                            child: Container(
+                              width: 200,
+                              margin: const EdgeInsets.only(right: 12),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isSelected ? Colors.blue : Colors.grey,
+                                  width: isSelected ? 2 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        service.shippingName ?? '',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: isSelected
+                                              ? Colors.blue
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        service.etd ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    formatRupiah(
+                                      service.shippingCost?.toDouble() ?? 0,
+                                    ),
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.blue
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+              const SizedBox(height: 24),
               BlocBuilder<CartBloc, CartState>(
                 builder: (context, cartState) {
                   double idrTotal = cartState.totalPrice * 16848;
+                  double shippingCost =
+                      _selectedService?.shippingCost?.toDouble() ?? 0;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -120,6 +262,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                       ),
                       const Divider(),
+                      if (_selectedService != null) ...[
+                        ListTile(
+                          title: const Text('Shipping Cost'),
+                          trailing: Text(
+                            formatRupiah(shippingCost),
+                            style: const TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        const Divider(),
+                      ],
                       ListTile(
                         title: const Text(
                           'Total (IDR)',
@@ -140,75 +295,87 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            final authState = context.read<AuthBloc>().state;
-                            if (authState is! Authenticated) return;
+                          onPressed: _selectedService == null
+                              ? null
+                              : () async {
+                                  final authState = context
+                                      .read<AuthBloc>()
+                                      .state;
+                                  if (authState is! Authenticated) return;
 
-                            final orderId =
-                                'ORDER-${DateTime.now().millisecondsSinceEpoch}';
+                                  final orderId =
+                                      'ORDER-${DateTime.now().millisecondsSinceEpoch}';
 
-                            try {
-                              final request = PaymentRequest(
-                                transactionDetails: TransactionDetails(
-                                  orderId: orderId,
-                                  grossAmount: idrTotal.toInt(),
-                                ),
-                                itemDetails: cartState.items
-                                    .map(
-                                      (item) => ItemDetail(
-                                        id: item.product.id.toString(),
-                                        name: item.product.title,
-                                        price: (item.product.price * 16848)
-                                            .toInt(),
-                                        quantity: item.quantity,
-                                        category: item.product.category,
+                                  try {
+                                    final request = PaymentRequest(
+                                      transactionDetails: TransactionDetails(
+                                        orderId: orderId,
+                                        grossAmount: idrTotal.toInt(),
                                       ),
-                                    )
-                                    .toList(),
-                              );
+                                      itemDetails: cartState.items
+                                          .map(
+                                            (item) => ItemDetail(
+                                              id: item.product.id.toString(),
+                                              name: item.product.title,
+                                              price:
+                                                  (item.product.price * 16848)
+                                                      .toInt(),
+                                              quantity: item.quantity,
+                                              category: item.product.category,
+                                            ),
+                                          )
+                                          .toList(),
+                                    );
 
-                              final result = await di
-                                  .sl<PaymentRepository>()
-                                  .getSnapToken(request);
+                                    final result = await di
+                                        .sl<PaymentRepository>()
+                                        .getSnapToken(request);
 
-                              result.fold(
-                                (failure) {
-                                  if (!mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(failure.message)),
-                                  );
+                                    result.fold(
+                                      (failure) {
+                                        if (!mounted) return;
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(failure.message),
+                                          ),
+                                        );
+                                      },
+                                      (snapToken) {
+                                        final order = Order(
+                                          id: orderId,
+                                          userId: authState.user.id,
+                                          items: cartState.items,
+                                          totalAmount: cartState.totalPrice,
+                                          status: 'pending',
+                                          transactionId: snapToken,
+                                          createdAt: DateTime.now(),
+                                          shippingName: _shippingName,
+                                          shippingAddress:
+                                              authState.user.address,
+                                          shippingPhone: _shippingPhone,
+                                        );
+
+                                        if (!mounted) return;
+                                        context.read<OrderBloc>().add(
+                                          CreateOrder(order),
+                                        );
+                                        context.read<CartBloc>().add(
+                                          ClearCart(),
+                                        );
+                                        context.pushReplacement(
+                                          '/payment?snapToken=$snapToken&orderId=$orderId',
+                                        );
+                                      },
+                                    );
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error: $e')),
+                                    );
+                                  }
                                 },
-                                (snapToken) {
-                                  final order = Order(
-                                    id: orderId,
-                                    userId: authState.user.id,
-                                    items: cartState.items,
-                                    totalAmount: cartState.totalPrice,
-                                    status: 'pending',
-                                    transactionId: snapToken,
-                                    createdAt: DateTime.now(),
-                                    shippingName: _shippingName,
-                                    shippingAddress: _shippingAddress,
-                                    shippingPhone: _shippingPhone,
-                                  );
-
-                                  if (!mounted) return;
-                                  context.read<OrderBloc>().add(
-                                    CreateOrder(order),
-                                  );
-                                  context.read<CartBloc>().add(ClearCart());
-                                  context.pushReplacement(
-                                    '/payment?snapToken=$snapToken&orderId=$orderId',
-                                  );
-                                },
-                              );
-                            } catch (e) {
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
-                            }
-                          },
                           child: const Text('Pay with Midtrans'),
                         ),
                       ),

@@ -58,7 +58,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: () async {
-                      final result = await context.push<Destination>('/search-address');
+                      final result = await context.push<Destination>(
+                        '/search-address',
+                      );
                       if (result != null) {
                         setState(() {
                           _selectedAddress = result;

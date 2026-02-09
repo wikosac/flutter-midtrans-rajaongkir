@@ -196,7 +196,7 @@ class _OrdersPageState extends State<OrdersPage> {
                             ListTile(
                               leading: const Icon(Icons.location_on),
                               title: const Text('Address'),
-                              subtitle: Text(order.shippingAddress),
+                              subtitle: Text(order.shippingAddress?.label ?? 'N/A'),
                               dense: true,
                             ),
                             const SizedBox(height: 16),
