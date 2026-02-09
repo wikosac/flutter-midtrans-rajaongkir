@@ -21,6 +21,7 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
 
   @override
   Future<void> createOrder(OrderModel order) async {
+    log('Creating order with ID: ${order.id}');
     await firestore.collection('orders').doc(order.id).set(order.toJson());
   }
 
@@ -42,9 +43,10 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
     String status,
     String? transactionId,
   ) async {
+    log('Updating order $orderId to status $status');
     await firestore.collection('orders').doc(orderId).update({
       'status': status,
-      if (transactionId != null) 'transactionId': transactionId,
+      'transactionId': ?transactionId,
     });
   }
 
