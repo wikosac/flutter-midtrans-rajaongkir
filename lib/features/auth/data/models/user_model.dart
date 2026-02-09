@@ -17,7 +17,7 @@ class UserModel extends User {
       email: json['email'],
       name: json['name'],
       phone: json['phone'],
-      address: json['address'] != null && json['address'] == {}
+      address: json['address'] != null
           ? DestinationModel.fromJson(json['address'])
           : null,
     );
@@ -29,7 +29,9 @@ class UserModel extends User {
       'email': email,
       'name': name,
       'phone': phone,
-      'address': address != null ? DestinationModel.fromEntity(address!).toJson() : null,
+      'address': address != null
+          ? DestinationModel.fromEntity(address!).toJson()
+          : null,
     };
   }
 }

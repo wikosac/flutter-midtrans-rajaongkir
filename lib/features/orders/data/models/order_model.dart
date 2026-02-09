@@ -1,5 +1,6 @@
 import '../../../cart/domain/entities/cart_item.dart';
 import '../../../products/data/models/product_model.dart';
+import '../../../shipping/data/models/destination_model.dart';
 import '../../domain/entities/order.dart';
 import '../../domain/entities/notification.dart';
 
@@ -42,7 +43,9 @@ class OrderModel extends Order {
       transactionId: json['transactionId'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       shippingName: json['shippingName'] as String,
-      shippingAddress: json['shippingAddress'] as String,
+      shippingAddress: json['shippingAddress'] != null
+          ? DestinationModel.fromJson(json['shippingAddress'] as Map<String, dynamic>)
+          : null,
       shippingPhone: json['shippingPhone'] as String,
       lastNotification: json['lastNotification'] != null
           ? Notification.fromJson(
@@ -76,7 +79,9 @@ class OrderModel extends Order {
       'transactionId': transactionId,
       'createdAt': createdAt.toIso8601String(),
       'shippingName': shippingName,
-      'shippingAddress': shippingAddress,
+      'shippingAddress': shippingAddress != null
+          ? DestinationModel.fromEntity(shippingAddress!).toJson()
+          : null,
       'shippingPhone': shippingPhone,
       'lastNotification': lastNotification?.toJson(),
     };

@@ -20,5 +20,13 @@ class Destination extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, label, provinceName, cityName, districtName, subdistrictName, zipCode];
+  List<Object?> get props => [
+    id,
+    label,
+    provinceName,
+    cityName,
+    districtName,
+    subdistrictName,
+    zipCode,
+  ];
 }
