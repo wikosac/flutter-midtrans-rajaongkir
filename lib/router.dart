@@ -13,6 +13,7 @@ import 'features/payment/presentation/bloc/checkout_bloc.dart';
 import 'injection_container.dart' as di;
 import 'features/orders/presentation/pages/orders_page.dart';
 import 'features/products/presentation/pages/product_detail_page.dart';
+import 'features/products/presentation/bloc/product_detail_bloc.dart';
 
 final router = GoRouter(
   initialLocation: '/login',
@@ -32,7 +33,10 @@ final router = GoRouter(
       path: '/product-detail',
       builder: (context, state) {
         final productId = int.parse(state.uri.queryParameters['id'] ?? '0');
-        return ProductDetailPage(productId: productId);
+        return BlocProvider(
+          create: (_) => di.sl<ProductDetailBloc>(),
+          child: ProductDetailPage(productId: productId),
+        );
       },
     ),
     GoRoute(
