@@ -75,177 +75,189 @@ class _OrdersPageState extends State<OrdersPage> {
             }
             return ListView.builder(
               itemCount: state.orders.length,
-              itemBuilder: (context, index) {
-                final order = state.orders[index];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: ExpansionTile(
-                    leading: Icon(
-                      _getStatusIcon(order.status),
-                      color: _getStatusColor(order.status),
-                      size: 32,
-                    ),
-                    title: Text(
-                      'Order #${order.id.substring(order.id.length - 8)}',
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              _getStatusIcon(order.status),
-                              size: 16,
-                              color: _getStatusColor(order.status),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Status: ${order.status.toUpperCase()}',
-                              style: TextStyle(
-                                color: _getStatusColor(order.status),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          'Total: \$${order.totalAmount.toStringAsFixed(2)}',
-                        ),
-                        Text(
-                          'Date: ${order.createdAt.toString().split('.')[0]}',
-                        ),
-                      ],
-                    ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Divider(),
-                            const Text(
-                              'Order Status',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.payment,
-                                  color: _getStatusColor(order.status),
-                                ),
-                                const SizedBox(width: 8),
-                                Text('Payment: ${order.status}'),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.local_shipping,
-                                  color: order.status == 'paid'
-                                      ? Colors.blue
-                                      : Colors.grey,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Shipping: ${order.status == 'paid' ? 'Processing' : 'Pending'}',
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.home,
-                                  color: order.status == 'completed'
-                                      ? Colors.green
-                                      : Colors.grey,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Delivery: ${order.status == 'completed' ? 'Delivered' : 'Not yet'}',
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Shipping Information:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ListTile(
-                              leading: const Icon(Icons.person),
-                              title: const Text('Name'),
-                              subtitle: Text(order.shippingName),
-                              dense: true,
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.phone),
-                              title: const Text('Phone'),
-                              subtitle: Text(order.shippingPhone),
-                              dense: true,
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.location_on),
-                              title: const Text('Address'),
-                              subtitle: Text(order.shippingAddress?.label ?? 'N/A'),
-                              dense: true,
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Items:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            ...order.items.map(
-                              (item) => ListTile(
-                                title: Text(item.product.title),
-                                subtitle: Text('Quantity: ${item.quantity}'),
-                                trailing: Text(
-                                  '\$${item.totalPrice.toStringAsFixed(2)}',
-                                ),
-                              ),
-                            ),
-                            const Divider(),
-                            ListTile(
-                              title: const Text(
-                                'Total Amount',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              trailing: Text(
-                                '\$${order.totalAmount.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            if (order.status.toLowerCase() == 'pending' &&
-                                order.transactionId != null)
-                              ActionButton(order: order),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+              itemBuilder: (context, index) =>
+                  _buildOrderCard(state.orders[index]),
             );
           } else if (state is OrderError) {
             return Center(child: Text(state.message));
           }
           return const SizedBox();
         },
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(Order order) {
+    return Card(
+      margin: const EdgeInsets.all(8),
+      child: ExpansionTile(
+        leading: Icon(
+          _getStatusIcon(order.status),
+          color: _getStatusColor(order.status),
+          size: 32,
+        ),
+        title: Text('Order #${order.id.substring(order.id.length - 8)}'),
+        subtitle: _buildOrderSummary(order),
+        children: [_buildOrderDetails(order)],
+      ),
+    );
+  }
+
+  Widget _buildOrderSummary(Order order) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Icon(
+              _getStatusIcon(order.status),
+              size: 16,
+              color: _getStatusColor(order.status),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Status: ${order.status.toUpperCase()}',
+              style: TextStyle(
+                color: _getStatusColor(order.status),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Text('Total: \$${order.totalAmount.toStringAsFixed(2)}'),
+        Text('Date: ${order.createdAt.toString().split('.')[0]}'),
+      ],
+    );
+  }
+
+  Widget _buildOrderDetails(Order order) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(),
+          _buildOrderStatus(order),
+          const SizedBox(height: 16),
+          _buildShippingInfo(order),
+          const SizedBox(height: 16),
+          _buildOrderItems(order),
+          const Divider(),
+          _buildTotalAmount(order),
+          if (order.status.toLowerCase() == 'pending' &&
+              order.transactionId != null)
+            ActionButton(order: order),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrderStatus(Order order) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Order Status',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Icon(Icons.payment, color: _getStatusColor(order.status)),
+            const SizedBox(width: 8),
+            Text('Payment: ${order.status}'),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Icon(
+              Icons.local_shipping,
+              color: order.status == 'paid' ? Colors.blue : Colors.grey,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Shipping: ${order.status == 'paid' ? 'Processing' : 'Pending'}',
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Icon(
+              Icons.home,
+              color: order.status == 'completed' ? Colors.green : Colors.grey,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Delivery: ${order.status == 'completed' ? 'Delivered' : 'Not yet'}',
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShippingInfo(Order order) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Shipping Information:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        ListTile(
+          leading: const Icon(Icons.person),
+          title: const Text('Name'),
+          subtitle: Text(order.shippingName),
+          dense: true,
+        ),
+        ListTile(
+          leading: const Icon(Icons.phone),
+          title: const Text('Phone'),
+          subtitle: Text(order.shippingPhone),
+          dense: true,
+        ),
+        ListTile(
+          leading: const Icon(Icons.location_on),
+          title: const Text('Address'),
+          subtitle: Text(order.shippingAddress?.label ?? 'N/A'),
+          dense: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrderItems(Order order) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Items:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        ...order.items.map(
+          (item) => ListTile(
+            title: Text(item.product.title),
+            subtitle: Text('Quantity: ${item.quantity}'),
+            trailing: Text('\$${item.totalPrice.toStringAsFixed(2)}'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTotalAmount(Order order) {
+    return ListTile(
+      title: const Text(
+        'Total Amount',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      trailing: Text(
+        '\$${order.totalAmount.toStringAsFixed(2)}',
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }

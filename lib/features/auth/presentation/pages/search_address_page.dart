@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_midtrans/features/shipping/data/datasources/rajaongkir_remote_data_source.dart';
 import 'package:flutter_midtrans/features/shipping/data/repositories/shipping_repository_impl.dart';
@@ -53,7 +51,6 @@ class _SearchAddressPageState extends State<SearchAddressPage> {
         }
       },
       (destinations) {
-        log('destinations: ${destinations[0]}');
         setState(() {
           _destinations = destinations;
           _isLoading = false;
@@ -68,40 +65,49 @@ class _SearchAddressPageState extends State<SearchAddressPage> {
       appBar: AppBar(title: const Text('Search Address')),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search address...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onSubmitted: _searchDestinations,
-              textInputAction: TextInputAction.search,
-            ),
-          ),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _destinations.isEmpty
-                ? const Center(child: Text('Search for a destination'))
-                : ListView.builder(
-                    itemCount: _destinations.length,
-                    itemBuilder: (context, index) {
-                      final destination = _destinations[index];
-                      return ListTile(
-                        leading: const Icon(Icons.location_on),
-                        title: Text(destination.label ?? ''),
-                        onTap: () => context.pop(destination),
-                      );
-                    },
-                  ),
-          ),
+          _buildSearchField(),
+          Expanded(child: _buildResultsList()),
         ],
       ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Search address...',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        onSubmitted: _searchDestinations,
+        textInputAction: TextInputAction.search,
+      ),
+    );
+  }
+
+  Widget _buildResultsList() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_destinations.isEmpty) {
+      return const Center(child: Text('Search for a destination'));
+    }
+    return ListView.builder(
+      itemCount: _destinations.length,
+      itemBuilder: (context, index) => _buildDestinationItem(_destinations[index]),
+    );
+  }
+
+  Widget _buildDestinationItem(Destination destination) {
+    return ListTile(
+      leading: const Icon(Icons.location_on),
+      title: Text(destination.label ?? ''),
+      onTap: () => context.pop(destination),
     );
   }
 

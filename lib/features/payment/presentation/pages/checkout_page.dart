@@ -108,285 +108,271 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Shipping Information',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.person, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            _shippingName,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(Icons.phone, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            _shippingPhone,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.location_on, size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              _shippingAddress?.label ?? '',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              _buildShippingInfo(),
               const SizedBox(height: 24),
-              const Text(
-                'Shipping Service',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              _isLoadingServices
-                  ? const Center(child: CircularProgressIndicator())
-                  : _shippingServices.isEmpty
-                  ? const Text('No shipping services available')
-                  : SizedBox(
-                      height: 84,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _shippingServices.length,
-                        itemBuilder: (context, index) {
-                          final service = _shippingServices[index];
-                          final isSelected = _selectedService == service;
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedService = service;
-                              });
-                            },
-                            child: Container(
-                              width: 200,
-                              margin: const EdgeInsets.only(right: 12),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: isSelected ? Colors.blue : Colors.grey,
-                                  width: isSelected ? 2 : 1,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        service.shippingName ?? '',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: isSelected
-                                              ? Colors.blue
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                      Text(
-                                        service.etd ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    formatRupiah(
-                                      service.shippingCost?.toDouble() ?? 0,
-                                    ),
-                                    style: TextStyle(
-                                      color: isSelected
-                                          ? Colors.blue
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+              _buildShippingServices(),
               const SizedBox(height: 24),
-              BlocBuilder<CartBloc, CartState>(
-                builder: (context, cartState) {
-                  double idrTotal = cartState.totalPrice * 16848;
-                  double shippingCost =
-                      _selectedService?.shippingCost?.toDouble() ?? 0;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Order Summary',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ...cartState.items.map(
-                        (item) => ListTile(
-                          title: Text(item.product.title),
-                          subtitle: Text('Quantity: ${item.quantity}'),
-                          trailing: Text(formatRupiah(item.totalPrice * 16848)),
-                        ),
-                      ),
-                      const Divider(),
-                      if (_selectedService != null) ...[
-                        ListTile(
-                          title: const Text('Shipping Cost'),
-                          trailing: Text(
-                            formatRupiah(shippingCost),
-                            style: const TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                        const Divider(),
-                      ],
-                      ListTile(
-                        title: const Text(
-                          'Total (IDR)',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        trailing: Text(
-                          formatRupiah(idrTotal),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _selectedService == null
-                              ? null
-                              : () async {
-                                  final authState = context
-                                      .read<AuthBloc>()
-                                      .state;
-                                  if (authState is! Authenticated) return;
-
-                                  final orderId =
-                                      'ORDER-${DateTime.now().millisecondsSinceEpoch}';
-
-                                  try {
-                                    final request = PaymentRequest(
-                                      transactionDetails: TransactionDetails(
-                                        orderId: orderId,
-                                        grossAmount: idrTotal.toInt(),
-                                      ),
-                                      itemDetails: cartState.items
-                                          .map(
-                                            (item) => ItemDetail(
-                                              id: item.product.id.toString(),
-                                              name: item.product.title,
-                                              price:
-                                                  (item.product.price * 16848)
-                                                      .toInt(),
-                                              quantity: item.quantity,
-                                              category: item.product.category,
-                                            ),
-                                          )
-                                          .toList(),
-                                    );
-
-                                    final result = await di
-                                        .sl<PaymentRepository>()
-                                        .getSnapToken(request);
-
-                                    result.fold(
-                                      (failure) {
-                                        if (!mounted) return;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(failure.message),
-                                          ),
-                                        );
-                                      },
-                                      (snapToken) {
-                                        final order = Order(
-                                          id: orderId,
-                                          userId: authState.user.id,
-                                          items: cartState.items,
-                                          totalAmount: cartState.totalPrice,
-                                          status: 'pending',
-                                          transactionId: snapToken,
-                                          createdAt: DateTime.now(),
-                                          shippingName: _shippingName,
-                                          shippingAddress:
-                                              authState.user.address,
-                                          shippingPhone: _shippingPhone,
-                                        );
-
-                                        if (!mounted) return;
-                                        context.read<OrderBloc>().add(
-                                          CreateOrder(order),
-                                        );
-                                        context.read<CartBloc>().add(
-                                          ClearCart(),
-                                        );
-                                        context.pushReplacement(
-                                          '/payment?snapToken=$snapToken&orderId=$orderId',
-                                        );
-                                      },
-                                    );
-                                  } catch (e) {
-                                    if (!mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Error: $e')),
-                                    );
-                                  }
-                                },
-                          child: const Text('Pay with Midtrans'),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+              _buildOrderSummary(),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildShippingInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Shipping Information',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.person, size: 20),
+                    const SizedBox(width: 8),
+                    Text(_shippingName, style: const TextStyle(fontSize: 16)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.phone, size: 20),
+                    const SizedBox(width: 8),
+                    Text(_shippingPhone, style: const TextStyle(fontSize: 16)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.location_on, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _shippingAddress?.label ?? '',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShippingServices() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Shipping Service',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        _isLoadingServices
+            ? const Center(child: CircularProgressIndicator())
+            : _shippingServices.isEmpty
+            ? const Text('No shipping services available')
+            : SizedBox(
+                height: 84,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _shippingServices.length,
+                  itemBuilder: (context, index) {
+                    final service = _shippingServices[index];
+                    final isSelected = _selectedService == service;
+                    return _buildShippingServiceCard(service, isSelected);
+                  },
+                ),
+              ),
+      ],
+    );
+  }
+
+  Widget _buildShippingServiceCard(ShippingService service, bool isSelected) {
+    return GestureDetector(
+      onTap: () => setState(() => _selectedService = service),
+      child: Container(
+        width: 200,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? Colors.blue : Colors.grey,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  service.shippingName ?? '',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isSelected ? Colors.blue : Colors.black,
+                  ),
+                ),
+                Text(
+                  service.etd ?? '',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+            Text(
+              formatRupiah(service.shippingCost?.toDouble() ?? 0),
+              style: TextStyle(color: isSelected ? Colors.blue : Colors.black),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderSummary() {
+    return BlocBuilder<CartBloc, CartState>(
+      builder: (context, cartState) {
+        double idrTotal = cartState.totalPrice * 16848;
+        double shippingCost = _selectedService?.shippingCost?.toDouble() ?? 0;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Order Summary',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ...cartState.items.map(
+              (item) => ListTile(
+                title: Text(item.product.title),
+                subtitle: Text('Quantity: ${item.quantity}'),
+                trailing: Text(formatRupiah(item.totalPrice * 16848)),
+              ),
+            ),
+            const Divider(),
+            if (_selectedService != null) ...[
+              ListTile(
+                title: const Text('Shipping Cost'),
+                trailing: Text(
+                  formatRupiah(shippingCost),
+                  style: const TextStyle(
+                    decoration: TextDecoration.lineThrough,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              const Divider(),
+            ],
+            ListTile(
+              title: const Text(
+                'Total (IDR)',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              trailing: Text(
+                formatRupiah(idrTotal),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildPaymentButton(cartState, idrTotal),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildPaymentButton(CartState cartState, double idrTotal) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _selectedService == null
+            ? null
+            : () => _processPayment(cartState, idrTotal),
+        child: const Text('Pay with Midtrans'),
+      ),
+    );
+  }
+
+  Future<void> _processPayment(CartState cartState, double idrTotal) async {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! Authenticated) return;
+
+    final orderId = 'ORDER-${DateTime.now().millisecondsSinceEpoch}';
+
+    try {
+      final request = PaymentRequest(
+        transactionDetails: TransactionDetails(
+          orderId: orderId,
+          grossAmount: idrTotal.toInt(),
+        ),
+        itemDetails: cartState.items
+            .map(
+              (item) => ItemDetail(
+                id: item.product.id.toString(),
+                name: item.product.title,
+                price: (item.product.price * 16848).toInt(),
+                quantity: item.quantity,
+                category: item.product.category,
+              ),
+            )
+            .toList(),
+      );
+
+      final result = await di.sl<PaymentRepository>().getSnapToken(request);
+
+      result.fold(
+        (failure) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(failure.message)));
+        },
+        (snapToken) {
+          final order = Order(
+            id: orderId,
+            userId: authState.user.id,
+            items: cartState.items,
+            totalAmount: cartState.totalPrice,
+            status: 'pending',
+            transactionId: snapToken,
+            createdAt: DateTime.now(),
+            shippingName: _shippingName,
+            shippingAddress: authState.user.address,
+            shippingPhone: _shippingPhone,
+          );
+
+          if (!mounted) return;
+          context.read<OrderBloc>().add(CreateOrder(order));
+          context.read<CartBloc>().add(ClearCart());
+          context.pushReplacement(
+            '/payment?snapToken=$snapToken&orderId=$orderId',
+          );
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
   }
 }

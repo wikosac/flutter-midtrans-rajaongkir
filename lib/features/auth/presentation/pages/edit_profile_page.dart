@@ -40,71 +40,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  _buildNameField(),
                   const SizedBox(height: 16),
-                  TextField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(
-                      labelText: 'Phone',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  _buildPhoneField(),
                   const SizedBox(height: 16),
-                  InkWell(
-                    onTap: () async {
-                      final result = await context.push<Destination>(
-                        '/search-address',
-                      );
-                      if (result != null) {
-                        setState(() {
-                          _selectedAddress = result;
-                        });
-                      }
-                    },
-                    child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Address',
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.search),
-                      ),
-                      child: Text(
-                        _selectedAddress == null
-                            ? 'Tap to search address'
-                            : _selectedAddress!.label ?? '',
-                        style: TextStyle(
-                          color: _selectedAddress == null
-                              ? Colors.grey
-                              : Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildAddressField(context),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final updatedUser = User(
-                          id: state.user.id,
-                          email: state.user.email,
-                          name: _nameController.text,
-                          phone: _phoneController.text,
-                          address: _selectedAddress,
-                        );
-                        context.read<AuthBloc>().add(
-                          UpdateProfileRequested(updatedUser),
-                        );
-                        context.pop();
-                      },
-                      child: const Text('Save'),
-                    ),
-                  ),
+                  _buildSaveButton(context, state),
                 ],
               ),
             );
@@ -113,6 +55,74 @@ class _EditProfilePageState extends State<EditProfilePage> {
         },
       ),
     );
+  }
+
+  Widget _buildNameField() {
+    return TextField(
+      controller: _nameController,
+      decoration: const InputDecoration(
+        labelText: 'Name',
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+
+  Widget _buildPhoneField() {
+    return TextField(
+      controller: _phoneController,
+      decoration: const InputDecoration(
+        labelText: 'Phone',
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+
+  Widget _buildAddressField(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        final result = await context.push<Destination>('/search-address');
+        if (result != null) {
+          setState(() {
+            _selectedAddress = result;
+          });
+        }
+      },
+      child: InputDecorator(
+        decoration: const InputDecoration(
+          labelText: 'Address',
+          border: OutlineInputBorder(),
+          suffixIcon: Icon(Icons.search),
+        ),
+        child: Text(
+          _selectedAddress == null ? 'Tap to search address' : _selectedAddress!.label ?? '',
+          style: TextStyle(
+            color: _selectedAddress == null ? Colors.grey : Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton(BuildContext context, Authenticated state) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => _saveProfile(context, state),
+        child: const Text('Save'),
+      ),
+    );
+  }
+
+  void _saveProfile(BuildContext context, Authenticated state) {
+    final updatedUser = User(
+      id: state.user.id,
+      email: state.user.email,
+      name: _nameController.text,
+      phone: _phoneController.text,
+      address: _selectedAddress,
+    );
+    context.read<AuthBloc>().add(UpdateProfileRequested(updatedUser));
+    context.pop();
   }
 
   @override
