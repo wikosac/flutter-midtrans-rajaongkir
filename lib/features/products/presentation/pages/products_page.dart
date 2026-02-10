@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_midtrans/features/products/domain/entities/category.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -17,18 +18,12 @@ class ProductsPage extends StatefulWidget {
 }
 
 class _ProductsPageState extends State<ProductsPage> {
-  String? _selectedCategory;
-  final List<String> _categories = [
-    'Clothes',
-    'Electronics',
-    'Furniture',
-    'Shoes',
-    'Miscellaneous',
-  ];
+  Category? _selectedCategory;
 
   @override
   void initState() {
     super.initState();
+    context.read<ProductBloc>().add(LoadCategories());
     context.read<ProductBloc>().add(LoadProducts());
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
@@ -78,7 +73,7 @@ class _ProductsPageState extends State<ProductsPage> {
       ),
       body: Column(
         children: [
-          _buildCategoryFilter(),
+          _buildCategoryFilter(context),
           Expanded(
             child: BlocBuilder<ProductBloc, ProductState>(
               builder: (context, state) {
@@ -111,7 +106,7 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildCategoryFilter() {
+  Widget _buildCategoryFilter(BuildContext context) {
     return Container(
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -128,12 +123,12 @@ class _ProductsPageState extends State<ProductsPage> {
           Expanded(
             child: ListView(
               scrollDirection: Axis.horizontal,
-              children: _categories
+              children: context.read<ProductBloc>().categories
                   .map(
                     (category) => Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
-                        label: Text(category),
+                        label: Text(category.name ?? 'Unknown'),
                         selected: _selectedCategory == category,
                         onSelected: (selected) {
                           setState(
@@ -142,9 +137,7 @@ class _ProductsPageState extends State<ProductsPage> {
                           );
                           if (selected) {
                             context.read<ProductBloc>().add(
-                              LoadProductsByCategory(
-                                _categories.indexOf(category) + 1,
-                              ),
+                              LoadProductsByCategory(category.url ?? ''),
                             );
                           } else {
                             context.read<ProductBloc>().add(LoadProducts());

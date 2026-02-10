@@ -18,15 +18,6 @@ class ProductLoaded extends ProductState {
   List<Object> get props => [products];
 }
 
-class CategoriesLoaded extends ProductState {
-  final List<String> categories;
-
-  CategoriesLoaded(this.categories);
-
-  @override
-  List<Object> get props => [categories];
-}
-
 class ProductError extends ProductState {
   final String message;
 

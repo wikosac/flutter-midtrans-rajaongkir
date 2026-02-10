@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter_midtrans/features/products/domain/entities/category.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
@@ -21,10 +22,10 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<Either<Failure, List<Product>>> getProductsByCategory(
-    int categoryId,
+    String url,
   ) async {
     try {
-      final products = await remoteDataSource.getProductsByCategory(categoryId);
+      final products = await remoteDataSource.getProductsByCategory(url);
       return Right(products);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -32,7 +33,7 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<Either<Failure, List<String>>> getCategories() async {
+  Future<Either<Failure, List<Category>>> getCategories() async {
     try {
       final categories = await remoteDataSource.getCategories();
       return Right(categories);
