@@ -9,7 +9,8 @@ part 'product_detail_state.dart';
 class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
   final ProductRepository repository;
 
-  ProductDetailBloc({required this.repository}) : super(ProductDetailInitial()) {
+  ProductDetailBloc({required this.repository})
+    : super(ProductDetailInitial()) {
     on<LoadProductDetail>(_onLoadProductDetail);
     on<ImageIndexChanged>(_onImageIndexChanged);
   }

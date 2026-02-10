@@ -20,12 +20,21 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _emailController.addListener(() => context.read<AuthFormBloc>().add(
-      FormFieldChanged(email: _emailController.text)));
-    _passwordController.addListener(() => context.read<AuthFormBloc>().add(
-      FormFieldChanged(password: _passwordController.text)));
-    _nameController.addListener(() => context.read<AuthFormBloc>().add(
-      FormFieldChanged(name: _nameController.text)));
+    _emailController.addListener(
+      () => context.read<AuthFormBloc>().add(
+        FormFieldChanged(email: _emailController.text),
+      ),
+    );
+    _passwordController.addListener(
+      () => context.read<AuthFormBloc>().add(
+        FormFieldChanged(password: _passwordController.text),
+      ),
+    );
+    _nameController.addListener(
+      () => context.read<AuthFormBloc>().add(
+        FormFieldChanged(name: _nameController.text),
+      ),
+    );
   }
 
   @override
@@ -48,7 +57,9 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.all(24),
                 child: Form(
                   key: _formKey,
-                  autovalidateMode: formState.autoValidate ? AutovalidateMode.onUserInteraction : AutovalidateMode.disabled,
+                  autovalidateMode: formState.autoValidate
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -114,7 +125,9 @@ class _LoginPageState extends State<LoginPage> {
         if (value == null || value.isEmpty) {
           return 'Please enter your email';
         }
-        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+        if (!RegExp(
+          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+        ).hasMatch(value)) {
           return 'Please enter a valid email';
         }
         return null;
@@ -153,7 +166,9 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: (isLoading || !formState.isValid) ? null : _handleSubmit,
+                    onPressed: (isLoading || !formState.isValid)
+                        ? null
+                        : _handleSubmit,
                     child: isLoading
                         ? const SizedBox(
                             height: 20,
@@ -165,7 +180,11 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
-                  onPressed: isLoading ? null : () => context.read<AuthBloc>().add(GoogleSignInRequested()),
+                  onPressed: isLoading
+                      ? null
+                      : () => context.read<AuthBloc>().add(
+                          GoogleSignInRequested(),
+                        ),
                   icon: const Icon(Icons.login),
                   label: const Text('Sign in with Google'),
                 ),
@@ -180,7 +199,9 @@ class _LoginPageState extends State<LoginPage> {
                           _passwordController.clear();
                         },
                   child: Text(
-                    formState.isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up',
+                    formState.isSignUp
+                        ? 'Already have an account? Sign In'
+                        : 'Don\'t have an account? Sign Up',
                   ),
                 ),
               ],

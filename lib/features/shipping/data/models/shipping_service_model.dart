@@ -32,16 +32,16 @@ class ShippingServiceModel extends ShippingService {
   }
 
   Map<String, dynamic> toJson() => {
-        'shipping_name': shippingName,
-        'service_name': serviceName,
-        'weight': weight,
-        'is_cod': isCod,
-        'shipping_cost': shippingCost,
-        'shipping_cashback': shippingCashback,
-        'shipping_cost_net': shippingCostNet,
-        'grandtotal': grandtotal,
-        'service_fee': serviceFee,
-        'net_income': netIncome,
-        'etd': etd,
-      };
+    'shipping_name': shippingName,
+    'service_name': serviceName,
+    'weight': weight,
+    'is_cod': isCod,
+    'shipping_cost': shippingCost,
+    'shipping_cashback': shippingCashback,
+    'shipping_cost_net': shippingCostNet,
+    'grandtotal': grandtotal,
+    'service_fee': serviceFee,
+    'net_income': netIncome,
+    'etd': etd,
+  };
 }

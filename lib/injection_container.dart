@@ -17,6 +17,7 @@ import 'features/products/data/repositories/product_repository_impl.dart';
 import 'features/products/domain/repositories/product_repository.dart';
 import 'features/products/presentation/bloc/product_bloc.dart';
 import 'features/products/presentation/bloc/product_detail_bloc.dart';
+import 'features/products/presentation/bloc/category_bloc.dart';
 
 import 'features/cart/data/datasources/cart_remote_data_source.dart';
 import 'features/cart/presentation/bloc/cart_bloc.dart';
@@ -44,12 +45,12 @@ Future<void> init() async {
   sl.registerFactory(() => AddressSearchBloc(repository: sl()));
   sl.registerFactory(() => ProductBloc(repository: sl()));
   sl.registerFactory(() => ProductDetailBloc(repository: sl()));
+  sl.registerFactory(() => CategoryBloc(repository: sl()));
   sl.registerFactory(() => CartBloc(remoteDataSource: sl()));
   sl.registerFactory(() => OrderBloc(repository: sl()));
-  sl.registerFactory(() => CheckoutBloc(
-        shippingRepository: sl(),
-        paymentRepository: sl(),
-      ));
+  sl.registerFactory(
+    () => CheckoutBloc(shippingRepository: sl(), paymentRepository: sl()),
+  );
 
   // Use cases
   sl.registerLazySingleton(() => SignIn(sl()));

@@ -10,11 +10,7 @@ class InitializeCheckout extends CheckoutEvent {
   final String phone;
   final Destination? address;
 
-  InitializeCheckout({
-    required this.name,
-    required this.phone,
-    this.address,
-  });
+  InitializeCheckout({required this.name, required this.phone, this.address});
 
   @override
   List<Object?> get props => [name, phone, address];
@@ -22,7 +18,7 @@ class InitializeCheckout extends CheckoutEvent {
 
 class LoadShippingServices extends CheckoutEvent {
   final int receiverDestinationId;
-  final int itemValue;
+  final double itemValue;
 
   LoadShippingServices({
     required this.receiverDestinationId,

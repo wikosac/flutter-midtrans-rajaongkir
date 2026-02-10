@@ -12,7 +12,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc({required this.repository}) : super(ProductInitial()) {
     on<LoadProducts>(_onLoadProducts);
     on<LoadProductsByCategory>(_onLoadProductsByCategory);
-    on<LoadCategories>(_onLoadCategories);
   }
 
   Future<void> _onLoadProducts(
@@ -32,21 +31,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     Emitter<ProductState> emit,
   ) async {
     emit(ProductLoading());
-    final result = await repository.getProductsByCategory(event.categoryId);
+    final result = await repository.getProductsByCategory(event.url);
     result.fold(
       (failure) => emit(ProductError(failure.message)),
       (products) => emit(ProductLoaded(products)),
-    );
-  }
-
-  Future<void> _onLoadCategories(
-    LoadCategories event,
-    Emitter<ProductState> emit,
-  ) async {
-    final result = await repository.getCategories();
-    result.fold(
-      (failure) => emit(ProductError(failure.message)),
-      (categories) => emit(CategoriesLoaded(categories)),
     );
   }
 }
