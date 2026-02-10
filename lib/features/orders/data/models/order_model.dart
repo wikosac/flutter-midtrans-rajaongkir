@@ -44,7 +44,9 @@ class OrderModel extends Order {
       createdAt: DateTime.parse(json['createdAt'] as String),
       shippingName: json['shippingName'] as String,
       shippingAddress: json['shippingAddress'] != null
-          ? DestinationModel.fromJson(json['shippingAddress'] as Map<String, dynamic>)
+          ? DestinationModel.fromJson(
+              json['shippingAddress'] as Map<String, dynamic>,
+            )
           : null,
       shippingPhone: json['shippingPhone'] as String,
       lastNotification: json['lastNotification'] != null

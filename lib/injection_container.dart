@@ -46,10 +46,9 @@ Future<void> init() async {
   sl.registerFactory(() => ProductDetailBloc(repository: sl()));
   sl.registerFactory(() => CartBloc(remoteDataSource: sl()));
   sl.registerFactory(() => OrderBloc(repository: sl()));
-  sl.registerFactory(() => CheckoutBloc(
-        shippingRepository: sl(),
-        paymentRepository: sl(),
-      ));
+  sl.registerFactory(
+    () => CheckoutBloc(shippingRepository: sl(), paymentRepository: sl()),
+  );
 
   // Use cases
   sl.registerLazySingleton(() => SignIn(sl()));

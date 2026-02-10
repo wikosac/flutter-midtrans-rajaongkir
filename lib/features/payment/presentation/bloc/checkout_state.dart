@@ -53,15 +53,15 @@ class CheckoutState extends Equatable {
 
   @override
   List<Object?> get props => [
-        shippingName,
-        shippingPhone,
-        shippingAddress,
-        shippingServices,
-        selectedService,
-        isLoadingServices,
-        isProcessingPayment,
-        orderId,
-        snapToken,
-        errorMessage,
-      ];
+    shippingName,
+    shippingPhone,
+    shippingAddress,
+    shippingServices,
+    selectedService,
+    isLoadingServices,
+    isProcessingPayment,
+    orderId,
+    snapToken,
+    errorMessage,
+  ];
 }

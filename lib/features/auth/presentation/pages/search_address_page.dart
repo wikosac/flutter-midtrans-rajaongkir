@@ -35,11 +35,11 @@ class _SearchAddressPageState extends State<SearchAddressPage> {
         decoration: InputDecoration(
           hintText: 'Search address...',
           prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        onSubmitted: (query) => context.read<AddressSearchBloc>().add(SearchAddressRequested(query)),
+        onSubmitted: (query) => context.read<AddressSearchBloc>().add(
+          SearchAddressRequested(query),
+        ),
         textInputAction: TextInputAction.search,
       ),
     );
@@ -49,9 +49,9 @@ class _SearchAddressPageState extends State<SearchAddressPage> {
     return BlocConsumer<AddressSearchBloc, AddressSearchState>(
       listener: (context, state) {
         if (state is AddressSearchError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       builder: (context, state) {
@@ -61,7 +61,8 @@ class _SearchAddressPageState extends State<SearchAddressPage> {
         if (state is AddressSearchLoaded) {
           return ListView.builder(
             itemCount: state.destinations.length,
-            itemBuilder: (context, index) => _buildDestinationItem(state.destinations[index]),
+            itemBuilder: (context, index) =>
+                _buildDestinationItem(state.destinations[index]),
           );
         }
         return const Center(child: Text('Search for a destination'));
