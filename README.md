@@ -20,12 +20,14 @@ A complete Flutter e-commerce application with Midtrans payment integration, bui
 - ✅ Dependency Injection with GetIt
 - ✅ Navigation with GoRouter
 - ✅ Form Validation
+- ✅ Optimized Widget Rebuilding
 
 ### Additional Features
 - ✅ Google Sign-In
 - ✅ Raja Ongkir Shipping Integration
 - ✅ Order Status Page
 - ✅ Cross-platform (Android & iOS)
+- ✅ BLoC Architecture for All Features
 
 ## Architecture
 
@@ -51,6 +53,36 @@ Each feature follows:
 - **Domain Layer**: Entities, Repositories (interfaces), Use Cases
 - **Data Layer**: Models, Data Sources, Repository Implementations
 - **Presentation Layer**: BLoC, Pages, Widgets
+
+### BLoC Architecture
+- **AuthBloc**: User authentication and profile management
+- **AuthFormBloc**: Form validation for login/signup
+- **AddressSearchBloc**: Address search with Raja Ongkir
+- **ProductBloc**: Product listing and categories
+- **ProductDetailBloc**: Individual product details
+- **CartBloc**: Shopping cart management
+- **CheckoutBloc**: Checkout process and shipping
+- **OrderBloc**: Order management and history
+
+## Key Features
+
+### BLoC State Management
+- Separate BLoCs for each feature domain
+- Optimized widget rebuilding with `buildWhen`
+- Form validation handled in dedicated BLoCs
+- Independent loading states for different data
+
+### Performance Optimizations
+- Categories loaded once without rebuilding product widgets
+- Image caching with `cached_network_image`
+- Efficient state management with Equatable
+- Minimal widget rebuilds using BLoC listeners
+
+### Clean Architecture
+- Domain entities with immutable data
+- Repository pattern with Either for error handling
+- Dependency injection with GetIt
+- Separation of concerns across layers
 
 ## Prerequisites
 
@@ -104,7 +136,7 @@ flutter pub get
 3. Create `.env` file in project root:
 
 ```env
-SHIPPING_COST_API_KEY=your_rajaongkir_api_key
+SHIPPING_DELIVERY_API_KEY=your_rajaongkir_api_key
 ```
 
 **Note**: Use Sandbox credentials for testing.
@@ -185,7 +217,7 @@ platform :ios, '12.0'
 - User profile is automatically created in Firestore
 
 ### 2. Browse Products
-- View all products from Platzi Fake API
+- View all products from DummyJSON API
 - Filter by categories
 - View product details with image gallery
 - Add products to cart
@@ -230,10 +262,9 @@ Use Midtrans Sandbox test credentials:
 
 ## API Endpoints
 
-- **Products API**: https://api.escuelajs.co/api/v1/products
-- **Categories API**: https://api.escuelajs.co/api/v1/categories
+- **Products API**: https://dummyjson.com/products
 - **Midtrans Snap API**: https://app.sandbox.midtrans.com/snap/v1/transactions
-- **Raja Ongkir API**: https://pro.rajaongkir.com/api
+- **Raja Ongkir API**: https://api-sandbox.collaborator.komerce.id/
 
 ## Project Structure
 
@@ -340,7 +371,7 @@ For questions or support, please open an issue in the repository.
 
 ## Acknowledgments
 
-- [Platzi Fake API](https://fakeapi.platzi.com/) for product data
+- [DummyJSON API](https://dummyjson.com/) for product data
 - [Midtrans](https://midtrans.com/) for payment gateway
 - [Raja Ongkir](https://rajaongkir.com/) for shipping services
 - [Firebase](https://firebase.google.com/) for backend services

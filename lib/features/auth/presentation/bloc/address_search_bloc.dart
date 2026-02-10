@@ -9,7 +9,8 @@ part 'address_search_state.dart';
 class AddressSearchBloc extends Bloc<AddressSearchEvent, AddressSearchState> {
   final ShippingRepository repository;
 
-  AddressSearchBloc({required this.repository}) : super(AddressSearchInitial()) {
+  AddressSearchBloc({required this.repository})
+    : super(AddressSearchInitial()) {
     on<SearchAddressRequested>(_onSearchAddressRequested);
   }
 

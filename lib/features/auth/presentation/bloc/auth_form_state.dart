@@ -36,5 +36,12 @@ class AuthFormState extends Equatable {
   }
 
   @override
-  List<Object> get props => [name, email, password, isSignUp, autoValidate, isValid];
+  List<Object> get props => [
+    name,
+    email,
+    password,
+    isSignUp,
+    autoValidate,
+    isValid,
+  ];
 }

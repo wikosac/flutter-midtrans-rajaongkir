@@ -94,7 +94,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           suffixIcon: Icon(Icons.search),
         ),
         child: Text(
-          _selectedAddress == null ? 'Tap to search address' : _selectedAddress!.label ?? '',
+          _selectedAddress == null
+              ? 'Tap to search address'
+              : _selectedAddress!.label ?? '',
           style: TextStyle(
             color: _selectedAddress == null ? Colors.grey : Colors.black,
           ),

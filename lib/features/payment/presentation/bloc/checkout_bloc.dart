@@ -27,11 +27,13 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     InitializeCheckout event,
     Emitter<CheckoutState> emit,
   ) {
-    emit(state.copyWith(
-      shippingName: event.name,
-      shippingPhone: event.phone,
-      shippingAddress: event.address,
-    ));
+    emit(
+      state.copyWith(
+        shippingName: event.name,
+        shippingPhone: event.phone,
+        shippingAddress: event.address,
+      ),
+    );
   }
 
   Future<void> _onLoadShippingServices(
@@ -46,15 +48,16 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       itemValue: event.itemValue,
     );
     result.fold(
-      (failure) => emit(state.copyWith(
-        isLoadingServices: false,
-        errorMessage: failure.message,
-      )),
-      (services) => emit(state.copyWith(
-        shippingServices: services,
-        isLoadingServices: false,
-        errorMessage: null,
-      )),
+      (failure) => emit(
+        state.copyWith(isLoadingServices: false, errorMessage: failure.message),
+      ),
+      (services) => emit(
+        state.copyWith(
+          shippingServices: services,
+          isLoadingServices: false,
+          errorMessage: null,
+        ),
+      ),
     );
   }
 
@@ -72,16 +75,20 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     emit(state.copyWith(isProcessingPayment: true));
     final result = await paymentRepository.getSnapToken(event.request);
     result.fold(
-      (failure) => emit(state.copyWith(
-        isProcessingPayment: false,
-        errorMessage: failure.message,
-      )),
-      (snapToken) => emit(state.copyWith(
-        isProcessingPayment: false,
-        orderId: event.request.transactionDetails.orderId,
-        snapToken: snapToken,
-        errorMessage: null,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          isProcessingPayment: false,
+          errorMessage: failure.message,
+        ),
+      ),
+      (snapToken) => emit(
+        state.copyWith(
+          isProcessingPayment: false,
+          orderId: event.request.transactionDetails.orderId,
+          snapToken: snapToken,
+          errorMessage: null,
+        ),
+      ),
     );
   }
 }

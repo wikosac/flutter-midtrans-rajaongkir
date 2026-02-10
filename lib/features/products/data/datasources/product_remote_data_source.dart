@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter_midtrans/features/products/data/models/category_model.dart';
 import 'package:http/http.dart' as http;
 import '../models/product_model.dart';
