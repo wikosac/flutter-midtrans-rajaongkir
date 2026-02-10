@@ -15,5 +15,3 @@ class LoadProductsByCategory extends ProductEvent {
   @override
   List<Object> get props => [url];
 }
-
-class LoadCategories extends ProductEvent {}

@@ -45,7 +45,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       shipperDestinationId: 17477,
       receiverDestinationId: event.receiverDestinationId,
       weight: 1,
-      itemValue: event.itemValue,
+      itemValue: event.itemValue.toInt(),
     );
     result.fold(
       (failure) => emit(

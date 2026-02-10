@@ -14,7 +14,7 @@ class ProductModel extends Product {
     return ProductModel(
       id: json['id'] as int,
       title: json['title'],
-      price: (json['price'] as num).toDouble(),
+      price: json['price'] as double,
       description: json['description'],
       category: json['category'],
       images: List<String>.from(json['images']),

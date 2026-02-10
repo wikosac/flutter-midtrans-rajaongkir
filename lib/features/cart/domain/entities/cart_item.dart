@@ -9,6 +9,10 @@ class CartItem extends Equatable {
 
   double get totalPrice => product.price * quantity;
 
+  int get idrPrice => (product.price * 16848).toInt();
+
+  int get idrTotalPrice => idrPrice * quantity;
+
   CartItem copyWith({int? quantity}) {
     return CartItem(product: product, quantity: quantity ?? this.quantity);
   }

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_midtrans/features/products/domain/entities/category.dart';
+import 'package:flutter_midtrans/features/products/presentation/bloc/category_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -23,7 +24,7 @@ class _ProductsPageState extends State<ProductsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<ProductBloc>().add(LoadCategories());
+    context.read<CategoryBloc>().add(LoadCategories());
     context.read<ProductBloc>().add(LoadProducts());
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
@@ -120,34 +121,44 @@ class _ProductsPageState extends State<ProductsPage> {
             child: const Text('All'),
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: context.read<ProductBloc>().categories
-                  .map(
-                    (category) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(category.name ?? 'Unknown'),
-                        selected: _selectedCategory == category,
-                        onSelected: (selected) {
-                          setState(
-                            () =>
-                                _selectedCategory = selected ? category : null,
-                          );
-                          if (selected) {
-                            context.read<ProductBloc>().add(
-                              LoadProductsByCategory(category.url ?? ''),
-                            );
-                          } else {
-                            context.read<ProductBloc>().add(LoadProducts());
-                          }
-                        },
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
+          BlocBuilder<CategoryBloc, CategoryState>(
+            builder: (context, state) {
+              if (state is CategoryLoaded) {
+                return Expanded(
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: state.categories
+                        .map(
+                          (category) => Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              label: Text(category.name ?? 'Unknown'),
+                              selected: _selectedCategory == category,
+                              onSelected: (selected) {
+                                setState(
+                                  () => _selectedCategory = selected
+                                      ? category
+                                      : null,
+                                );
+                                if (selected) {
+                                  context.read<ProductBloc>().add(
+                                    LoadProductsByCategory(category.url ?? ''),
+                                  );
+                                } else {
+                                  context.read<ProductBloc>().add(
+                                    LoadProducts(),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                );
+              }
+              return const SizedBox();
+            },
           ),
         ],
       ),

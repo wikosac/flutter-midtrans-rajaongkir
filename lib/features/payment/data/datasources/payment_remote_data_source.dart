@@ -24,13 +24,13 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
         },
         body: json.encode(request.toJson()),
       );
+        final data = json.decode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = json.decode(response.body);
         return data['token'];
       } else {
         throw Exception(
-          'Failed to get snap token: ${response.statusCode} ${response.reasonPhrase}',
+          '${data['error'] ?? 'Unknown error'}',
         );
       }
     } catch (e) {
