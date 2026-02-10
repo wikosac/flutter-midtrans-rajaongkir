@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_midtrans/features/products/domain/entities/category.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 
@@ -8,6 +9,10 @@ part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ProductRepository repository;
+  bool _hasFetched = false;
+  List<Category> _categories = [];
+
+  List<Category> get categories => _categories;
 
   ProductBloc({required this.repository}) : super(ProductInitial()) {
     on<LoadProducts>(_onLoadProducts);
