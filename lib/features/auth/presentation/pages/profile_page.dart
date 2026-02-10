@@ -70,18 +70,6 @@ class ProfilePage extends StatelessWidget {
                   icon: const Icon(Icons.receipt_long),
                   label: const Text('My Orders'),
                 ),
-                const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: () => context.push('/edit-profile'),
-                  icon: const Icon(Icons.edit),
-                  label: const Text('Edit Profile'),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () => context.push('/orders'),
-                  icon: const Icon(Icons.receipt_long),
-                  label: const Text('My Orders'),
-                ),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
                   onPressed: () async {
