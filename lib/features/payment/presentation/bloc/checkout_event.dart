@@ -18,7 +18,7 @@ class InitializeCheckout extends CheckoutEvent {
 
 class LoadShippingServices extends CheckoutEvent {
   final int receiverDestinationId;
-  final int itemValue;
+  final double itemValue;
 
   LoadShippingServices({
     required this.receiverDestinationId,

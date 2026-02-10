@@ -7,6 +7,9 @@ class CartState extends Equatable {
 
   double get totalPrice => items.fold(0, (sum, item) => sum + item.totalPrice);
 
+  int get idrTotalPrice =>
+      items.fold(0, (sum, item) => sum + item.idrTotalPrice);
+
   int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
 
   @override

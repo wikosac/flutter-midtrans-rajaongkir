@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_midtrans/features/products/presentation/bloc/category_bloc.dart';
 import 'injection_container.dart' as di;
 import 'router.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => di.sl<AuthBloc>()..add(CheckAuthStatus())),
         BlocProvider(create: (_) => di.sl<ProductBloc>()),
+        BlocProvider(create: (_) => di.sl<CategoryBloc>()),
         BlocProvider(create: (_) => di.sl<CartBloc>()),
         BlocProvider(create: (_) => di.sl<OrderBloc>()),
       ],
