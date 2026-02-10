@@ -20,20 +20,14 @@ A complete Flutter e-commerce application with Midtrans payment integration, bui
 - ✅ Dependency Injection with GetIt
 - ✅ Navigation with GoRouter
 - ✅ Form Validation
-<<<<<<< HEAD
 - ✅ Optimized Widget Rebuilding
-=======
->>>>>>> master
 
 ### Additional Features
 - ✅ Google Sign-In
 - ✅ Raja Ongkir Shipping Integration
 - ✅ Order Status Page
 - ✅ Cross-platform (Android & iOS)
-<<<<<<< HEAD
 - ✅ BLoC Architecture for All Features
-=======
->>>>>>> master
 
 ## Architecture
 
@@ -145,11 +139,7 @@ flutter pub get
 3. Create `.env` file in project root:
 
 ```env
-<<<<<<< HEAD
 SHIPPING_DELIVERY_API_KEY=your_rajaongkir_api_key
-=======
-SHIPPING_COST_API_KEY=your_rajaongkir_api_key
->>>>>>> master
 ```
 
 **Note**: Use Sandbox credentials for testing.
@@ -230,11 +220,7 @@ platform :ios, '12.0'
 - User profile is automatically created in Firestore
 
 ### 2. Browse Products
-<<<<<<< HEAD
 - View all products from DummyJSON API
-=======
-- View all products from Platzi Fake API
->>>>>>> master
 - Filter by categories
 - View product details with image gallery
 - Add products to cart
@@ -279,16 +265,9 @@ Use Midtrans Sandbox test credentials:
 
 ## API Endpoints
 
-<<<<<<< HEAD
 - **Products API**: https://dummyjson.com/products
 - **Midtrans Snap API**: https://app.sandbox.midtrans.com/snap/v1/transactions
 - **Raja Ongkir API**: https://api-sandbox.collaborator.komerce.id/
-=======
-- **Products API**: https://api.escuelajs.co/api/v1/products
-- **Categories API**: https://api.escuelajs.co/api/v1/categories
-- **Midtrans Snap API**: https://app.sandbox.midtrans.com/snap/v1/transactions
-- **Raja Ongkir API**: https://pro.rajaongkir.com/api
->>>>>>> master
 
 ## Project Structure
 
@@ -395,11 +374,7 @@ For questions or support, please open an issue in the repository.
 
 ## Acknowledgments
 
-<<<<<<< HEAD
 - [DummyJSON API](https://dummyjson.com/) for product data
-=======
-- [Platzi Fake API](https://fakeapi.platzi.com/) for product data
->>>>>>> master
 - [Midtrans](https://midtrans.com/) for payment gateway
 - [Raja Ongkir](https://rajaongkir.com/) for shipping services
 - [Firebase](https://firebase.google.com/) for backend services
