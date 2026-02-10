@@ -1,6 +1,6 @@
-# Flutter Midtrans E-Commerce App
+# Flutter Midtrans & Raja Ongkir E-Commerce App
 
-A complete Flutter e-commerce application with Midtrans payment integration, built using Clean Architecture, BLoC pattern, Firebase, and Go Router.
+A complete Flutter e-commerce application with Midtrans payment & Raja Ongkir integration, built using Clean Architecture, BLoC pattern, Firebase, and Go Router.
 
 ## Features
 
@@ -54,7 +54,6 @@ Each feature follows:
 - **Data Layer**: Models, Data Sources, Repository Implementations
 - **Presentation Layer**: BLoC, Pages, Widgets
 
-<<<<<<< HEAD
 ### BLoC Architecture
 - **AuthBloc**: User authentication and profile management
 - **AuthFormBloc**: Form validation for login/signup
@@ -85,8 +84,6 @@ Each feature follows:
 - Dependency injection with GetIt
 - Separation of concerns across layers
 
-=======
->>>>>>> master
 ## Prerequisites
 
 - Flutter SDK (3.10.7 or higher)
@@ -377,5 +374,5 @@ For questions or support, please open an issue in the repository.
 - [DummyJSON API](https://dummyjson.com/) for product data
 - [Midtrans](https://midtrans.com/) for payment gateway
 - [Raja Ongkir](https://rajaongkir.com/) for shipping services
-- [Firebase](https://firebase.google.com/) for backend services
+- [Vercel](https://nextjs-midtrans-bay.vercel.app/) for backend services
 - Flutter community for amazing packages
