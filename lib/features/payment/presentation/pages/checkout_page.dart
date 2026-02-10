@@ -35,7 +35,7 @@ class CheckoutPage extends StatelessWidget {
           bloc.add(
             LoadShippingServices(
               receiverDestinationId: authState.user.address?.id ?? 0,
-              itemValue: (cartState.totalPrice * 16848).toInt(),
+              itemValue: cartState.totalPrice * 16848,
             ),
           );
         }
@@ -238,7 +238,6 @@ class CheckoutPage extends StatelessWidget {
       builder: (context, cartState) {
         return BlocBuilder<CheckoutBloc, CheckoutState>(
           builder: (context, checkoutState) {
-            double idrTotal = cartState.totalPrice * 16848;
             double shippingCost =
                 checkoutState.selectedService?.shippingCost?.toDouble() ?? 0;
             return Column(
@@ -253,7 +252,7 @@ class CheckoutPage extends StatelessWidget {
                   (item) => ListTile(
                     title: Text(item.product.title),
                     subtitle: Text('Quantity: ${item.quantity}'),
-                    trailing: Text(formatRupiah(item.totalPrice * 16848)),
+                    trailing: Text(formatRupiah(item.idrTotalPrice)),
                   ),
                 ),
                 const Divider(),
@@ -276,7 +275,7 @@ class CheckoutPage extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   trailing: Text(
-                    formatRupiah(idrTotal),
+                    formatRupiah(cartState.idrTotalPrice),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -284,12 +283,7 @@ class CheckoutPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _buildPaymentButton(
-                  context,
-                  cartState,
-                  checkoutState,
-                  idrTotal,
-                ),
+                _buildPaymentButton(context, cartState, checkoutState),
               ],
             );
           },
@@ -302,7 +296,6 @@ class CheckoutPage extends StatelessWidget {
     BuildContext context,
     CartState cartState,
     CheckoutState checkoutState,
-    double idrTotal,
   ) {
     return SizedBox(
       width: double.infinity,
@@ -311,8 +304,7 @@ class CheckoutPage extends StatelessWidget {
             checkoutState.selectedService == null ||
                 checkoutState.isProcessingPayment
             ? null
-            : () =>
-                  _processPayment(context, cartState, checkoutState, idrTotal),
+            : () => _processPayment(context, cartState, checkoutState),
         child: checkoutState.isProcessingPayment
             ? const SizedBox(
                 height: 20,
@@ -328,7 +320,6 @@ class CheckoutPage extends StatelessWidget {
     BuildContext context,
     CartState cartState,
     CheckoutState checkoutState,
-    double idrTotal,
   ) {
     final authState = context.read<AuthBloc>().state;
     if (authState is! Authenticated ||
@@ -342,14 +333,14 @@ class CheckoutPage extends StatelessWidget {
     final request = PaymentRequest(
       transactionDetails: TransactionDetails(
         orderId: orderId,
-        grossAmount: idrTotal.toInt(),
+        grossAmount: cartState.idrTotalPrice,
       ),
       itemDetails: cartState.items
           .map(
             (item) => ItemDetail(
               id: item.product.id.toString(),
               name: item.product.title,
-              price: (item.product.price * 16848).toInt(),
+              price: item.idrPrice,
               quantity: item.quantity,
               category: item.product.category,
             ),
