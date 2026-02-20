@@ -136,16 +136,23 @@ flutter pub get
 3. Create `.env` file in project root:
 
 ```env
-SHIPPING_DELIVERY_API_KEY=your_rajaongkir_api_key
+CLIENT_KEY=your_midtrans_api_key
+SERVER_KEY=your_midtrans_api_key
 ```
 
-**Note**: Use Sandbox credentials for testing.
+**Note**: I'm using Next.js backend, available on my `nextjs-midtrans` repository.
 
 ### 5. Raja Ongkir Setup
 
 1. Sign up at [Raja Ongkir](https://rajaongkir.com/)
 2. Get your **API Key** from Dashboard
-3. Add API key to `.env` file (see step 4 above)
+3. Add API key to `.env` file
+
+```env
+PAYMENT_API_KEY=your_rajaongkir_api_key
+SHIPPING_COST_API_KEY=your_rajaongkir_api_key
+SHIPPING_DELIVERY_API_KEY=your_rajaongkir_api_key
+```
 
 ### 6. Google Sign-In Setup (Optional)
 
